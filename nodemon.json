@@ -1,0 +1,7 @@
+{
+    "watch": [
+      "./server.js",
+      "./lexgi.config.mjs"
+    ],
+    "verbose": true
+}

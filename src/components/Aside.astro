@@ -1,0 +1,139 @@
+---
+import { Collections } from "../../lexgi.mjs";
+
+const title = "Lexgi CMS";
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.slice(1);
+---
+
+<aside class="aside aside-opened">
+  <header class="aside-header">
+    <div class="aside-header-content">Lexgi CMS</div>
+  </header>
+
+  <nav class="nav">
+    <div class="nav-block">
+      <div class="nav-block-items">
+        <a
+          class={currentPath === "admin"
+            ? "active nav-block-item"
+            : "nav-block-item"}
+          href={"/"}
+        >
+          Dashboard
+        </a>
+        <a
+          class={currentPath === `admin/settings`
+            ? "active nav-block-item"
+            : "nav-block-item"}
+          href={"/admin/settings"}
+        >
+          Settings
+        </a>
+      </div>
+    </div>
+
+    <div class="nav-block">
+      <button class="nav-block-label"> Collections</button>
+
+      <div class="nav-block-items">
+        {
+          Object.values(Collections).map((collection:any, index:any) => (
+            <a
+              class={
+                currentPath === `admin/${collection.slug}`
+                  ? "active nav-block-item"
+                  : "nav-block-item"
+              }
+              href={"/admin/" + collection.slug}
+            >
+              {collection.name}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<style>
+  .aside {
+    display: flex;
+    flex-direction: column;
+    max-width: var(--nav-width);
+    min-width: var(--nav-width);
+    width: 100%;
+    border-right: 1px solid rgb(255 255 255 / 7%);
+    background: black;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+
+    
+  }
+
+  .aside.aside-opened {
+      opacity: 1;
+  }
+
+  .aside-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid rgb(255 255 255 / 7%);
+    color: #d3d4d5;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    background: #000;
+    min-height: 90px;
+  }
+
+  .aside-header-content {
+    padding-left: 58px;
+    font-weight: 600;
+    width: 100%;
+  }
+
+  .nav {
+    padding: 16px;
+    flex: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .nav-block {
+    display: grid;
+    gap: 6px;
+  }
+
+  .nav-block-label {
+    display: flex;
+    border: none;
+    padding: 12px 0;
+    justify-content: space-between;
+    border-radius: 4px;
+    background: none;
+    color: #707070;
+  }
+
+  .nav-block-items {
+    display: grid;
+  }
+
+  .nav-block-item {
+    padding: 0.5rem 16px;
+    color: #b0b0b0;
+    text-decoration: none;
+    border-left: 2px solid #151515;
+    white-space: nowrap;
+
+    &.active {
+      color: #9948ff;
+      border-color: #924beb;
+    }
+  }
+</style>

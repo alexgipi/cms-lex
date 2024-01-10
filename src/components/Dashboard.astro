@@ -1,0 +1,126 @@
+---
+import Card from "../components/Card.astro";
+import { Collections } from "../../lexgi.mjs";
+---
+
+<div class="container">
+    <h1>Welcome to <span class="text-gradient">Lexgi CMS</span></h1>
+    <p class="instructions">
+      To get started, open the directory <code>src/pages</code> in your
+      project.<br />
+      <strong>Code Challenge:</strong> Tweak the "Welcome to Astro"
+      message above.
+    </p>
+    <ul role="list" class="link-card-grid">
+      {
+        Object.values(Collections).map((collection:any, index:any) => (
+          <Card
+            href={'/admin/'+collection.slug}
+            title={collection.name}
+            body="Learn how Astro works and explore the official API docs."
+            counter={0}
+          />
+        ))
+      }
+    </ul>
+
+    <section class="dashboard-blocks">
+      <div class="dashboard-block">
+          <header>
+              Ultimos pedidos
+          </header>
+          <div style="padding: 30px;">
+              Content block
+          </div>
+      </div>
+
+      <div class="dashboard-block">
+          <header>
+              Ultimos pedidos
+          </header>
+          <div style="padding: 30px;">
+              Content block
+          </div>
+      </div>
+    </section>
+</div>
+
+
+<style>
+
+  .astro-a {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translatex(-50%);
+    width: 220px;
+    height: auto;
+    z-index: -1;
+  }
+  h1 {
+	  font-size: 3.6rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 1em 0;
+    text-wrap: balance;
+    max-width: 90%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 16px;
+  }
+  
+  .text-gradient {
+	background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 400%;
+    background-position: 0%;
+    text-wrap: balance;
+  }
+  .instructions {
+    margin-bottom: 2rem;
+    border: 1px solid rgba(var(--accent-light), 25%);
+    background: linear-gradient(
+      rgba(var(--accent-dark), 66%),
+      rgba(var(--accent-dark), 33%)
+    );
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+  .instructions code {
+    font-size: 0.8em;
+    font-weight: bold;
+    background: rgba(var(--accent-light), 12%);
+    color: rgb(var(--accent-light));
+    border-radius: 4px;
+    padding: 0.3em 0.4em;
+  }
+  .instructions strong {
+    color: rgb(var(--accent-light));
+  }
+  .link-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(35ch,1fr));
+    gap: 1.6rem;
+    padding: 0;
+    margin: 2rem 0;
+  }
+
+  section.dashboard-blocks {
+    display: flex;
+    gap: 1.6rem;
+  }
+
+  .dashboard-block {
+    flex: auto;
+    padding: 0;
+    background: #0b0b0b;
+    border-radius: 8px;
+    border: 1px solid #141414;
+
+    & header {
+      padding: 22px 26px;
+      border-bottom: 1px solid #141414;
+    }
+  }
+</style>

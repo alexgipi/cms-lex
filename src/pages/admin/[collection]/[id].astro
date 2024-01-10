@@ -1,0 +1,570 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Aside from "../../../components/Aside.astro";
+import Header from "../../../components/Header.astro";
+import UploadField from "../../../components/UploadField.svelte";
+import { getCollection } from "../../../../lexgi.mjs";
+import { capitalizeFirstLetter, slugify } from "../../../../utils.js"
+import { API_URL } from "../../../../consts";
+import MyRich from "../../../components/MyRich.svelte";
+
+const currentLang = 'es';
+const title = "Lexgi CMS";
+const { collection: collectionSlug, id } = Astro.params;
+console.log({id})
+const document = await getCollectionDocById(id || '');
+console.log({document})
+
+const collection = getCollection(collectionSlug);
+const fields = collection?.fields;
+
+const mainFields: any[] = [];
+const sidebarFields: any[] = [];
+let relationTypeFieldsDocs:any = {};
+
+await separateFields(fields);
+
+async function separateFields(fields:any) {
+  await Promise.all(fields.map(async (field:any) => {
+    if (field?.options?.sidebar) {
+      sidebarFields.push(field);
+    } else {
+      mainFields.push(field);
+    }
+
+    if (field.type === 'relation' && field.relationTo) {
+      await addRelationField(field);
+    }
+  }));
+}
+
+async function addRelationField(field:any){
+  const {name, relationTo} = field;
+  const relationToSlug = slugify(relationTo);
+
+  let docs:any = await getCollectionDocs(relationToSlug);
+
+  field.docs = docs;
+}
+
+if (Astro.request.method === "POST") {
+  try {
+    console.log("POST")
+    let formData = await Astro.request.formData();
+    console.log(formData)
+    // Crear un nuevo objeto FormData
+    // Crear un nuevo objeto FormData
+    let newFormData = new FormData();
+
+    // Añadir solo los campos que no están vacíos al nuevo objeto FormData
+    for (let [key, value] of formData.entries()) {
+      if(typeof value === 'object' && value?.size === 0 && value.name === 'undefined') {
+        console.log('Es imagen y undefined')
+      } else {
+        if(value != document[key] && value != ''){
+          console.log("Este es distinto: " + value)
+          newFormData.append(key, value);
+        }
+      }
+    }
+
+    // Llamar a la función createDoc con el newFormData
+    await updateDoc(newFormData);
+    return Astro.redirect('/admin/' + collectionSlug)
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+
+async function updateDoc(formData:any) {
+  try {
+    const res = await fetch(API_URL + collectionSlug + '/' + id, {
+      method: "PATCH",
+      body: formData
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    // const data = await res.json();
+    // console.log({data})
+
+    // return data;
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getCollectionDocs(collectionSlug:string){
+  try {
+    const res = await fetch(API_URL + collectionSlug, 
+      {
+          method: "GET",
+      }
+    );
+
+    const data = await res.json();
+
+    return data;
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getCollectionDocById(id:string){
+  try {
+    const res = await fetch(API_URL + collectionSlug + '/' + id, 
+      {
+          method: "GET",
+      }
+    );
+
+    const data = await res.json();
+
+    return data;
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+---
+
+<Layout title={collectionSlug}>
+  <button class="toggle-aside-button" data-toggle-nav id="toggle-nav">
+    <svg
+      class="icon-open-menu"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+
+  <div class="layout aside-opened">
+    <Aside />
+    <div class="layout-content">
+      <Header breadcumb={collection?.name + " / Create"} />
+      <main class="main padding-0">
+        <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
+          <header
+            class="page-header sticky top-0 z-50 container p-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+          >
+            <div class="w-full flex justify-between items-center">
+              <div class="flex gap-4">
+                <h1
+                  class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
+                >
+                  {document.name}
+                </h1>
+
+                <a
+                  href={`/admin/${collectionSlug}/create`}
+                  type="button"
+                  data-modal-target="add-user-modal"
+                  data-modal-toggle="add-user-modal"
+                  class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >
+                  <svg
+                    class="w-5 h-5 mr-2 -ml-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    ><path
+                      fill-rule="evenodd"
+                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                      clip-rule="evenodd"></path></svg
+                  >
+                   Add new
+                </a>
+              </div>
+
+              <div class="flex gap-4">
+                <button type="submit" class="text-white bg-violet-700 hover:bg-violet-900 focus:ring-4 focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-violet-900 focus:outline-none dark:focus:ring-violet-800">
+                  Guardar cambios
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <div class="document-form flex-auto">
+            <div class="document-form__main flex flex-col gap-6">
+              {
+                mainFields.map((field) => (
+                  <div class="form-row">
+                    <div class={field?.type === "boolean" ? 'form-field flex-row gap-6' : 'form-field flex-col gap-6'}>
+                      <label for={field.name}>
+                        {
+                          () => {
+                            if (typeof field?.label === 'object') {
+                              const result = field?.label[currentLang]
+                              return result
+                            } else if (typeof field?.label === 'string') {
+                              const result = field?.label;
+                              return result
+                            } else {
+                              return capitalizeFirstLetter(field?.name.replaceAll("_", " "))
+                            }
+                          }
+                        }
+
+                        {field?.required && (
+                          <span class="required-symbol">*</span>
+                        )}
+                      </label>
+
+                      {field?.type === "text" && (
+                        <input type="text" id={field.name} name={field.name} value={document[field.name]} />
+                      )}
+
+                      {field?.type === "number" && (
+                        <input
+                          id={field.name}
+                          name={field.name}
+                          type="number"
+                          value={document[field.name]}
+                        />
+                      )}
+
+                      {(field?.type === "images" ||
+                        field?.type === "image") && (
+
+                        <UploadField client:load name={field.name} multiple={field?.type === "images"}></UploadField>
+
+                      )}
+
+                      {field?.type === "relation" &&
+                        <div class="relative">
+                          <button data-dropdown-toggle={field?.name} data-dropdown-placement="bottom" class="w-full justify-between text-white bg-violet-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:bg-zinc-900 dark:hover:bg-violet-700 dark:focus:ring-violet-800" type="button">
+                            Dropdown search 
+                            <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                            </svg>
+                          </button>
+
+                          <div id={field?.name} class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-zinc-700">
+                            <ul class="h-48 p-3 overflow-y-auto text-sm text-zinc-700 dark:text-zinc-200" aria-labelledby="dropdownSearchButton">
+                              {field?.docs?.map((doc:any) => (
+                                <li>
+                                  <div class="flex items-center ps-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-600">
+                                    <input 
+                                    checked={(typeof document[field?.name] === 'string' && document[field?.name] === doc._id) || typeof document[field?.name] === 'object' && document[field?.name].indexOf(doc._id) != -1 } 
+                                    id={doc._id} 
+                                    name={field?.name} 
+                                    type="checkbox" 
+                                    value={doc._id} 
+                                    class="text-violet-500 w-4 h-4 bg-zinc-100 border-zinc-300 rounded focus:ring-violet-500 dark:focus:ring-violet-600 dark:ring-offset-zinc-700 dark:focus:ring-offset-zinc-700 focus:ring-2 dark:bg-zinc-600 dark:border-zinc-500"/>
+                                    
+                                    <label for={doc._id} class="w-full py-2 ms-2 text-sm font-medium text-zinc-900 rounded dark:text-zinc-300">
+                                        {
+                                          Object.keys(doc).map((key:any, i:number) => (
+                                            i < 3 && key != '_id' && doc[key] != null &&                                              
+                                            <div>
+                                              {doc[key]}
+                                            </div>                                             
+                                            
+                                          ))
+                                        }
+                                    </label>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                                                 
+                        </div>
+                      }
+
+                      {field?.type === "select" && (
+                        <select
+                          id={field.name}
+                          name={field.name}
+                          class="bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block w-full p-4 dark:bg-[#000] dark:border-[#eeeeee14] dark:placeholder-zinc-400 dark:text-white dark:focus:ring-violet-500 dark:focus:border-violet-500"
+                        >
+                          <option selected>Choose a {field?.name}</option>
+                          
+                          { 
+                            field?.enum.map((option:any) => (
+                              <option selected={document[field?.name] === option} value={option}>{option}</option>
+                            ))
+                          }
+                          
+                        </select>
+                      )}
+
+                      
+                      {field?.type === "richText" && <MyRich name={field.name} client:load value={document[field.name] || ''}></MyRich>}
+
+                      {field?.type === "boolean" &&
+                        <div class="flex">
+                          <input
+                          id={field.name}
+                          name={field.name}
+                          type="checkbox"
+                          value={document[field.name]}
+                          />
+                        </div>
+                      }
+                    </div>
+                  </div>
+                ))
+              }
+              
+            </div>
+            { sidebarFields.length > 0 &&
+            <div class="document-form__aside flex flex-col gap-6">
+              {
+                sidebarFields.map((field) => (
+                  <div class="form-row">
+                    <div class="form-field flex-col gap-6">
+                      <label for={field.name}>
+                        {
+                          () => {
+                            if (typeof field?.label === 'object') {
+                              const result = field?.label[currentLang]
+                              return result
+                            } else if (typeof field?.label === 'string') {
+                              const result = field?.label;
+                              return result
+                            } else {
+                              return capitalizeFirstLetter(field?.name.replaceAll("_", " "))
+                            }
+                          }
+                        }
+
+                        {field?.required && (
+                          <span class="required-symbol">*</span>
+                        )}
+                      </label>
+
+                      {field?.type === "text" && (
+                        <input type="text" id={field.name} name={field.name} value={document[field.name]}/>
+                      )}
+
+                      {field?.type === "number" && (
+                        <input
+                          id={field.name}
+                          name={field.name}
+                          type="number"
+                          value={document[field.name]}
+                        />
+                      )}
+
+                      {(field?.type === "images" ||
+                        field?.type === "image") && (
+                        
+                        <UploadField client:load name={field.name} multiple={field?.type === "images"}></UploadField>
+
+                      )}
+
+                      {field?.type === "relation" &&
+                        <div class="relative">
+                          <button data-dropdown-toggle={field?.name} data-dropdown-placement="bottom" class="w-full justify-between text-white bg-violet-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:bg-zinc-900 dark:hover:bg-violet-700 dark:focus:ring-violet-800" type="button">
+                            Dropdown search 
+                            <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                            </svg>
+                          </button>
+
+                          <div id={field?.name} class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-zinc-700">
+                            <ul class="h-48 p-3 overflow-y-auto text-sm text-zinc-700 dark:text-zinc-200" aria-labelledby="dropdownSearchButton">
+                              {field?.docs?.map((doc:any) => (
+                                <li>
+                                  <div class="flex items-center ps-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-600">
+                                    <input 
+                                    checked={(typeof document[field?.name] === 'string' && document[field?.name] === doc._id) || typeof document[field?.name] === 'object' && document[field?.name].indexOf(doc._id) != -1 } 
+                                    id={doc._id} 
+                                    name={field?.name} 
+                                    type="checkbox" 
+                                    value={doc._id} 
+                                    class="text-violet-500 w-4 h-4 bg-zinc-100 border-zinc-300 rounded focus:ring-violet-500 dark:focus:ring-violet-600 dark:ring-offset-zinc-700 dark:focus:ring-offset-zinc-700 focus:ring-2 dark:bg-zinc-600 dark:border-zinc-500"/>
+                                    
+                                    <label for={doc._id} class="w-full py-2 ms-2 text-sm font-medium text-zinc-900 rounded dark:text-zinc-300">
+                                        {
+                                          Object.keys(doc).map((key:any, i:number) => (
+                                            i < 3 && key != '_id' && doc[key] != null &&                                              
+                                            <div>
+                                              {doc[key]}
+                                            </div>                                             
+                                            
+                                          ))
+                                        }
+                                    </label>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                                                 
+                        </div>
+                      }
+
+                      {field?.type === "richText" && <MyRich name={field.name} client:load value={document[field.name]}></MyRich>}
+
+                      {field?.type === "boolean" &&
+                        
+                        <div class="flex items-center ps-4 border border-zinc-200 rounded dark:border-zinc-900">
+                            <input checked={document[field.name]} id="bordered-radio-1" type="radio" value="true" name={field.name} class="w-4 h-4 text-zinc-600 bg-zinc-100 border-zinc-300 dark:bg-zinc-700 dark:border-zinc-600"/>
+                            <label for="bordered-radio-1" class="w-full py-4 ms-2 text-sm font-medium text-zinc-900 dark:text-zinc-300">
+                              True
+                            </label>
+                        </div>
+                        <div class="flex items-center ps-4 border border-zinc-200 rounded dark:border-zinc-900">
+                            <input checked={!document[field.name]} id="bordered-radio-2" type="radio" value="false" name={field.name} class="w-4 h-4 text-zinc-600 bg-zinc-100 border-zinc-300 dark:bg-zinc-700 dark:border-zinc-600"/>
+                            <label for="bordered-radio-2" class="w-full py-4 ms-2 text-sm font-medium text-zinc-900 dark:text-zinc-300">
+                              False
+                            </label>
+                        </div>
+
+                      }
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+            }
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const toggleNavBtn = document.querySelector("[data-toggle-nav]");
+  const layout = document.querySelector(".layout");
+  const aside = document.querySelector(".aside");
+
+  // Add event listeners to fire confetti when a button is clicked.
+
+  toggleNavBtn?.addEventListener("click", () => {
+    if (layout?.classList.contains("aside-opened")) {
+      layout?.classList.remove("aside-opened");
+      aside?.classList.remove("aside-opened");
+    } else {
+      layout?.classList.add("aside-opened");
+      aside?.classList.add("aside-opened");
+    }
+  });
+</script>
+
+<style>
+  h1 {
+    margin: 0;
+  }
+
+  .page-header {
+    border-bottom: 1px solid rgb(255 255 255 / 7%);
+  }
+
+  .no-content-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+    margin: 3rem 0;
+
+    & p {
+      font-size: 0.84em;
+      color: #a7a7a7;
+      margin: 0;
+    }
+
+    & button {
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #000;
+      font-weight: 600;
+    }
+  }
+
+  .document-form {
+    display: grid;
+    grid-template-columns: 1fr 490px;
+  }
+
+  .document-form__aside,
+  .document-form__main {
+    flex: auto;
+    padding: 3rem;
+  }
+
+  .document-form__aside {
+    max-width: 490px;
+    border-left: 1px solid rgb(255 255 255 / 7%);
+    width: 100%;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 1rem;
+  }
+
+  .form-field {
+    flex: auto;
+    display: flex;
+  }
+
+  .form-field input:not(input[type="checkbox"]):not(input[type="radio"]),
+  .form-field textarea,
+  .form-field .rich-text-editor__content {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    outline: 1px solid #eeeeee14;
+    font-size: 0.9em;
+    max-width: 100%;
+  }
+
+  .form-field textarea {
+    min-height: 140px;
+    min-width: 100%;
+    width: 100% !important;
+    font-size: 0.96em;
+    padding: 20px 24px;
+    line-height: 1.44;
+  }
+
+  .rich-text-editor {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .rich-text-editor header button {
+    background: #252525;
+    padding: 4px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+  }
+
+  span.required-symbol {
+    color: #f44336;
+    margin-left: 0.1em;
+  }
+
+  
+</style>

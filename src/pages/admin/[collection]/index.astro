@@ -1,0 +1,141 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Aside from "../../../components/Aside.astro";
+import Header from "../../../components/Header.astro";
+import TableList from "../../../components/TableList.svelte"
+import pluralize from 'pluralize';
+import { Collections } from "../../../../lexgi.mjs";
+import { capitalizeFirstLetter } from "../../../../utils.js"
+import { API_URL } from "../../../../consts";
+
+const title = "Lexgi CMS";
+const { collection } = Astro.params;
+const cols:any = Collections;
+
+const collectionName = capitalizeFirstLetter(collection?.replaceAll('-', ' ')) || null;
+
+let documents = [];
+let keysClean: string[] = []
+let collectionFields: any;
+
+if(collection){
+  collectionFields = cols[collection]?.fields;
+}
+
+async function getDocuments(){
+  const response = await fetch(API_URL + collection);
+  if(response.ok) return await response?.json();
+  
+}
+
+if(collection === 'settings'){
+
+}else {
+  documents = await getDocuments();
+  // Si tienes al menos un documento en el array
+  if (documents?.length > 0) {
+    // Obtiene las claves del primer documento (suponiendo que todos los documentos tienen las mismas claves)
+    const allKeys = Object.keys(documents[0]);
+    const keysToIgnore = ['__v'];
+    keysClean = allKeys.filter(key => !keysToIgnore.includes(key));
+  } else {
+    
+  }
+}
+---
+
+<Layout title={collectionName}>
+  <button class="toggle-aside-button" data-toggle-nav id="toggle-nav">
+    <svg
+      class="icon-open-menu"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+
+  <div class="layout aside-opened">
+    <Aside />
+
+    <div class="layout-content">
+      <Header breadcumb={collectionName} />
+      
+      <main class="main">
+        <div class="w-full flex-auto flex flex-col">
+          <section class="collection-list flex-auto flex flex-col">
+
+            { (!documents || documents?.length === 0) &&
+              <div class="no-content-section container">
+                <p>No <strong>{collectionName}</strong> found. Either no <span class="capitalize">{collection?.replaceAll('-', ' ')}</span> exist yet or none match the filters you've specified above.</p>
+                <a class="btn" href={collection+'/create'}>Create new <span>{pluralize.singular(collectionName)}</span></a>
+              </div>
+            }
+
+            { documents?.length > 0 &&
+              <TableList client:only collectionFields={collectionFields} collectionName={collectionName} collection={collection} documents={documents}></TableList>
+            }
+          </section>   
+        </div>
+      </main>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const toggleNavBtn = document.querySelector("[data-toggle-nav]");
+  const layout = document.querySelector(".layout");
+  const aside = document.querySelector(".aside");
+
+  // Add event listeners to fire confetti when a button is clicked.
+
+  toggleNavBtn?.addEventListener("click", () => {
+    if (layout?.classList.contains("aside-opened")) {
+      layout?.classList.remove("aside-opened");
+      aside?.classList.remove("aside-opened");
+    } else {
+      layout?.classList.add("aside-opened");
+      aside?.classList.add("aside-opened");
+    }
+  });
+</script>
+
+<style>
+  h1 {
+    margin: 0;
+  }
+
+  .no-content-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+    margin: 3rem 0;
+
+  }
+
+  .no-content-section p {
+      font-size: 0.84em;
+      color: #a7a7a7;
+      margin: 0;
+  }
+
+  .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #000;
+      font-weight: 600;
+    }
+</style>
