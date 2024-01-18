@@ -17,3 +17,15 @@ export function slugify(str) {
       .replace(/\s+/g, '-') // replace spaces with hyphens
       .replace(/-+/g, '-'); // remove consecutive hyphens
 }
+
+export function formatOrderNumber(number, length) {
+    return String(number).padStart(length, "0");
+}
+
+export function formatCurrency(number) {
+    return number.toLocaleString('es-ES', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 2
+    });
+}
