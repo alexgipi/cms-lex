@@ -1,3 +1,2 @@
-import { lexgiConfig } from "./lexgi.config.mjs";
-const port = lexgiConfig.port || 3400;
-export const API_URL = `http://localhost:${port}/api/`;
+export const API_URL = `http://localhost:${process.env.PORT || 3400}/api/`;
+export const siteUrl = 'http://localhost:4321';
