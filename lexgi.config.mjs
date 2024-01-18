@@ -360,77 +360,17 @@ export const CollectionsConfig = [
     ],
   },
   {
-    name: "Cartas",
+    name: "Sliders",
     fields: [
       {
-        name: "name",
-        type: "text",
-        default: null,
+        name: "files",
+        type: "images",
+        multiple: true,
       },
       {
-        name: "userName",
+        name: "alt",
         type: "text",
-        required: true,
-      },
-      {
-        name: "email",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "password",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "role",
-        type: "text",
-        default: "customer",
-      },
-      {
-        name: "address",
-        type: "text",
-        default: null,
-      },
-    ],
-  },
-  {
-    name: "Cerdos",
-    fields: [
-      {
-        name: "name",
-        type: "text",
-        default: null,
-      },
-      {
-        name: "userName",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "email",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "password",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "role",
-        type: "text",
-        default: "customer",
-      },
-      {
-        name: "address",
-        type: "text",
-        default: null,
       },
     ],
   },
 ];
-
-export const lexgiConfig = {
-    port: 4500
-}
