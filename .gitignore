@@ -1,6 +1,9 @@
 # build output
 dist/
 
+# uploads dir
+uploads/
+
 # generated types
 .astro/
 
