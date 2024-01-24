@@ -155,25 +155,43 @@
         {collectionName}
       </h1>
 
-      <a
-        href={collection + "/create"}
-        type="button"
-        data-modal-target="add-user-modal"
-        data-modal-toggle="add-user-modal"
-        class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-      >
-        <svg
-          class="w-5 h-5 mr-2 -ml-1"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-          ><path
-            fill-rule="evenodd"
-            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-            clip-rule="evenodd"></path></svg
+      {#if collection === 'media'}
+        <button
+          class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
         >
-          Add new
-      </a>
+          <svg
+            class="w-5 h-5 mr-2 -ml-1"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+            ><path
+              fill-rule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clip-rule="evenodd"></path></svg
+          >
+            Upload
+        </button>
+      {:else}
+        <a
+          href={collection + "/create"}
+          type="button"
+          data-modal-target="add-user-modal"
+          data-modal-toggle="add-user-modal"
+          class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        >
+          <svg
+            class="w-5 h-5 mr-2 -ml-1"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+            ><path
+              fill-rule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clip-rule="evenodd"></path></svg
+          >
+            Add new
+        </a>
+      {/if}
     </div>
 
     <div class="flex flex-auto gap-4">
@@ -437,17 +455,26 @@
                               <img
                                 class="bg-[#fff] rounded-lg w-[70px]"
                                 alt="Imágen"
-                                src={document[key.name]}
+                                src={'http://localhost:3500/uploads/' + document[key.name]}
                               />
                             </div>
                           {:else if key.type === "images"}
                             {#if document[key.name].length > 0}
                               <div class="flex gap-2">
-                                <img
-                                  class="bg-[#fff] rounded-lg w-[70px]"
-                                  alt="Imágen"
-                                  src={document[key.name][0]}
-                                />
+                                {#if key?.relationTo != 'undefined'}
+                                  <img
+                                    class="bg-[#111] max-h-[80px] object-cover rounded-lg w-[80px]"
+                                    alt="Imágen"
+                                    src={'http://localhost:3500/uploads/' + document[key.name][0].file}
+                                  />
+                                {:else}
+                                hola
+                                  <img
+                                    class="bg-[#111] max-h-[80px] object-cover rounded-lg w-[80px]"
+                                    alt="Imágen"
+                                    src={'http://localhost:3500/uploads/' + document[key.name][0]}
+                                  />
+                                {/if}
 
                                 {#if document[key.name].length > 1}
                                   <div
