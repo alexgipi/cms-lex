@@ -7,6 +7,7 @@ import { CollectionsConfig } from "./lexgi.config.mjs";
 import userExtractor from "./middleware/userExtractor.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import isAdmin from "./middleware/isAdmin.js";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -14,11 +15,15 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const { originalname } = file;
-        const extension = originalname.split('.')[1];
+        const originalnameSplitted = originalname.split('.');        
+        const name = slugify(originalnameSplitted[0]);
+        const extension = originalnameSplitted[1];
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, `${file.fieldname}-${uniqueSuffix}.${extension}`)
+
+        cb(null, `${name}.${extension}`)
     }
 })
+
   
 const upload = multer({ storage: storage })
 
@@ -114,10 +119,31 @@ export function createCollectionEndpoints(collection, router) {
           }        
   
         } else {
-  
-          newSchema[field.name] = {
-            type: fieldTypeTypes[field.type].type,
-          };
+
+          if (field.type === 'images'){
+            const relationToSlug = slugify(field.relationTo);
+           
+            if(relationToSlug != 'undefined'){
+              console.log(relationToSlug, field.name)
+              newSchema[field.name] = {
+                type: Schema.ObjectId,
+                ref: relationToSlug,
+                autopopulate: true,
+              };
+
+              if(field.hasMany){
+                newSchema[field.name] = [newSchema[field.name]]
+              }
+            } else {
+              newSchema[field.name] = {
+                type: fieldTypeTypes[field.type].type,
+              };
+            }
+          } else {
+            newSchema[field.name] = {
+              type: fieldTypeTypes[field.type].type,
+            };
+          }          
   
         }
   
@@ -191,14 +217,11 @@ export function createCollectionEndpoints(collection, router) {
         }
       });
 
-      router.get("/users", userExtractor, async (req, res) => {
+      router.get("/users", async (req, res) => {
         const users = await Model.find({});
 
         // sacar userId de request
-        res.send({
-          userId: req.userId,
-          users,
-        });
+        res.send(users);
       });
 
       router.post("/users/login", async (req, res) => {
@@ -246,62 +269,100 @@ export function createCollectionEndpoints(collection, router) {
         }
       });
       
+    } else if(collection.slug === 'orders'){
+      // Orders
+      router.get("/orders", isAdmin, async (req, res) => {
+        const orders = await Model.find({});
+
+        // sacar userId de request
+        res.send({
+          orders,
+        });
+      });
+
+      router.get("/orders/user", userExtractor, async (req, res) => {
+        const { userId, userEmail } = req;
+        const orders = await Model.find({ email:userEmail }).sort('-createdAt');
+
+        // sacar userId de request
+        res.send({
+          orders,
+        });
+      });
+
+      router.get("/orders/:orderNumber", userExtractor, async (req, res) => {
+        const { userId, userEmail } = req;
+        const { orderNumber } = req.params;
+
+        console.log(userId)
+
+        const order = await Model.findOne({ email: userEmail, orderNumber });
+
+        console.log(order)
+
+        // sacar userId de request
+        res.send({
+          order,
+        });
+      });
     } else {
-    
       router.post(`/${collection.slug}`, cpUpload, async (req, res) => {
         try {
-          const { name, slug} = req.body;
-    
+          const { name, slug } = req.body;
           const files = req.files;
           const data = req.body;
-    
-          if(files){
-            Object.keys(files).map(key => {
+      
+          if (files) {
+            for (const key of Object.keys(files)) {
               const fieldFiles = files[key];
-              collection?.fields.forEach((field) => {
-                if(field.type === 'images' || field.type === 'image'){
-                  if(field.name === key){
-                    const multiple = field?.multiple;
-                    const fileNamesArray = [];
-    
-                    fieldFiles.forEach(fieldFile => {
-                      fileNamesArray.push(fieldFile.filename);
-                    })
-    
-                    if(multiple){
-                      data[key] = fileNamesArray;
-                    }else {
-                      data[key] = fileNamesArray[0];
-                    }
-    
+      
+              await Promise.all(
+                fieldFiles.map(async (fieldFile) => {
+                  const newMediaData = {
+                    file: fieldFile.filename,
+                  };
+      
+                  const newMedia = new mongoose.models['media'](newMediaData);
+                  await newMedia.save();
+      
+                  return newMedia._id;
+                })
+              ).then((fileNamesArray) => {
+                const field = collection?.fields.find((field) =>
+                  field.type === 'images' || field.type === 'image' ? field.name === key : false
+                );
+      
+                if (field) {
+                  const multiple = field?.multiple;
+                  if (multiple) {
+                    data[key] = fileNamesArray;
+                  } else {
+                    data[key] = fileNamesArray[0];
                   }
                 }
-              })
-              
-            })
+              });
+            }
           }
       
-          if(!slug || slug === undefined){
-            data.slug = slugify(name)
+          if (!slug || slug === undefined) {
+            data.slug = slugify(name);
           } else {
-            data.slug = slugify(slug)
+            data.slug = slugify(slug);
           }
       
-          const newDoc = new Model(data);
+          const newDoc = await new Model(data);
           await newDoc.save();
       
           res.send({
-            data: newDoc
-          })
-          
+            data: newDoc,
+          });
         } catch (error) {
           console.error("Error creating " + collection.slug, error.message);
-          res.status(500).send({ 
+          res.status(500).send({
             error: "Error creating " + collection.slug,
-            message: error.message
+            message: error.message,
           });
         }
-        
       });
     
       router.get(`/${collection.slug}`, async (req, res) => {
@@ -345,29 +406,36 @@ export function createCollectionEndpoints(collection, router) {
           const files = req.files;
           let updateData = req.body;
     
-          if(files){
-            Object.keys(files).map(key => {
+          if (files) {
+            for (const key of Object.keys(files)) {
               const fieldFiles = files[key];
-              collection?.fields.forEach((field) => {
-                if(field.type === 'images' || field.type === 'image'){
-                  if(field.name === key){
-                    const multiple = field?.multiple;
-                    const fileNamesArray = [];
-    
-                    fieldFiles.forEach(fieldFile => {
-                      fileNamesArray.push(fieldFile.filename);
-                    })
-    
-                    if(multiple){
-                      updateData[key] = fileNamesArray;
-                    }else {
-                      updateData[key] = fileNamesArray[0];
-                    }
+      
+              await Promise.all(
+                fieldFiles.map(async (fieldFile) => {
+                  const newMediaData = {
+                    file: fieldFile.filename,
+                  };
+      
+                  const newMedia = new mongoose.models['media'](newMediaData);
+                  await newMedia.save();
+      
+                  return newMedia._id;
+                })
+              ).then((fileNamesArray) => {
+                const field = collection?.fields.find((field) =>
+                  field.type === 'images' || field.type === 'image' ? field.name === key : false
+                );
+      
+                if (field) {
+                  const multiple = field?.multiple;
+                  if (multiple) {
+                    updateData[key] = fileNamesArray;
+                  } else {
+                    updateData[key] = fileNamesArray[0];
                   }
                 }
-              })
-              
-            })
+              });
+            }
           }
       
       
@@ -463,3 +531,77 @@ function generateRandomString(length) {
   }
   return randomString;
 }
+
+// Import external images
+export async function importExternalImages() {
+  const Product = mongoose.models['products'];
+  const products = await Product.find();
+
+  let counter = 0;
+  // Iterar sobre los productos
+  for (const product of products) {
+      // Iterar sobre las URLs de las imágenes del producto
+      let mediadDocIds = [];
+      console.log(product)
+
+      for (const fileUrl of product.images) {
+
+          try {
+              const notValid = fileUrl.startsWith('/');
+
+              if(notValid) {
+                console.log('not valid')
+              }else {
+                const fileName = fileUrl.split('/').pop();
+
+                // Realizar una solicitud HTTP para obtener el contenido del archivo remoto
+                const response = await fetch(fileUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Error al obtener el contenido del archivo desde ${fileUrl}: ${response.statusText}`);
+                }
+                counter++;
+
+                // console.log({counter, fileName, productName: product.name, productId: product._id})
+
+                const fileBlob = await response.blob();                
+
+                // Crear un objeto FormData para enviar el archivo al servidor
+                const formData = new FormData();
+                formData.append('file', fileBlob, fileName); // Ajusta el nombre del archivo según tus necesidades
+
+                // Realizar una solicitud HTTP POST al endpoint de medios en tu servidor
+                const uploadResponse = await fetch('http://localhost:3500/api/media', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error(`Error al subir el archivo al servidor: ${uploadResponse.statusText}`);
+                }
+
+                console.log(`Archivo subido exitosamente a uploads/${fileName}`);
+                const responseData = await uploadResponse.json();
+                const mediaDoc = responseData.data;
+                mediadDocIds.push(mediaDoc._id);
+
+              }
+              
+          } catch (error) {
+              console.error(error.message);
+          }
+      }
+
+      // Update product.images
+      console.log(mediadDocIds)
+      const updatedProduct = await Product.findByIdAndUpdate(
+        product._id, 
+        { images: mediadDocIds },
+        { new: true }
+      );
+      
+      console.log({images: updatedProduct.images})
+  }
+}
+
+
