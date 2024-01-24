@@ -134,6 +134,8 @@ export const CollectionsConfig = [
         type: "images",
         default: null,
         multiple: true,
+        relationTo: "Media",
+        hasMany: true,
         max: 10,
         options: {
           sidebar: true,
@@ -198,6 +200,8 @@ export const CollectionsConfig = [
         name: "images",
         type: "images",
         multiple: true,
+        relationTo: "Media",
+        hasMany: true,
         max: 10,
         default: null,
         options: {
@@ -312,6 +316,9 @@ export const CollectionsConfig = [
         name: "status",
         type: "text",
         default: "processing",
+        options: {
+          sidebar: true,
+        }
       },
     ],
   },
@@ -349,27 +356,103 @@ export const CollectionsConfig = [
     },
     fields: [
       {
-        name: "files",
-        type: "images",
-        multiple: true,
+        name: "file",
+        type: "image",
+        reqired: true,
+      },
+      {
+        name: "slug",
+        type: "text",
+        default: null,
+        options: {
+          sidebar: true
+        }
       },
       {
         name: "alt",
         type: "text",
+        default: null,
+        options: {
+          sidebar: true
+        }
+      },
+      {
+        name: "legend",
+        type: "text",
+        default: null,
+        options: {
+          sidebar: true
+        }
+      },
+      {
+        name: "description",
+        type: "richText",
+        default: null,
       },
     ],
   },
   {
-    name: "Sliders",
+    name: "Menus",
     fields: [
       {
-        name: "files",
-        type: "images",
-        multiple: true,
+        name: "name",
+        type: "text",
+        unique: true,
+        reqired: true,
+      },
+      {
+        name: "slug",
+        type: "text",
+        unique: true,
+        default: null,
+        options: {
+          sidebar: true
+        }
       },
       {
         name: "alt",
         type: "text",
+        default: null,
+        options: {
+          sidebar: true
+        }
+      },
+      {
+        name: "legend",
+        type: "text",
+        default: null,
+        options: {
+          sidebar: true
+        }
+      },
+      {
+        name: "description",
+        type: "richText",
+        default: null,
+      },
+    ],
+  },
+  {
+    name: "Pages",
+    fields: [
+      {
+        name: "name",
+        type: "text",
+        reqired: true,
+      },
+      {
+        name: "slug",
+        type: "text",
+        unique: true,
+        default: null,
+        options: {
+          sidebar: true
+        }
+      },
+      {
+        name: "content",
+        type: "richText",
+        default: null,
       },
     ],
   },
