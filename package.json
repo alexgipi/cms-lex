@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "server": "nodemon -q --exec npm run lexgi",
+    "server:dev": "nodemon -q --exec node server.js",
     "lexgi": "npm run buildAndStart -s",
     "buildAndStart": "astro build && node server.js",
     "dev": "astro dev",
@@ -24,6 +25,7 @@
     "@types/express": "^4.17.21",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
+    "apexcharts": "^3.45.2",
     "astro": "^4.0.7",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
