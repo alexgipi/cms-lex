@@ -105,10 +105,6 @@ async function getCollectionDocs(collectionSlug:string){
     console.error(error);
   }
 }
-
-const numbers = {
-  '1': 1
-}
 ---
 
 <Layout title={collectionSlug}>
@@ -137,6 +133,7 @@ const numbers = {
       <Header breadcumb={collection?.name + " / Create"} />
       <main class="main padding-0">
         <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
+          
           <header
             class="page-header sticky top-0 z-50 container p-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
           >
