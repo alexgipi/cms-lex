@@ -1,6 +1,7 @@
 ---
 import Card from "../components/Card.astro";
 import { Collections } from "../../lexgi.mjs";
+import Chart from "./Chart.astro";
 ---
 
 <div class="container">
@@ -26,14 +27,12 @@ import { Collections } from "../../lexgi.mjs";
 
     <section class="dashboard-blocks">
       <div class="dashboard-block">
-          <header>
-              Ultimos pedidos
-          </header>
-          <div style="padding: 30px;">
-              Content block
-          </div>
+          <Chart id="chart-1"></Chart>
       </div>
-
+      <div class="dashboard-block">
+          <Chart id="chart-2"></Chart>
+      </div>
+<!-- 
       <div class="dashboard-block">
           <header>
               Ultimos pedidos
@@ -41,7 +40,7 @@ import { Collections } from "../../lexgi.mjs";
           <div style="padding: 30px;">
               Content block
           </div>
-      </div>
+      </div> -->
     </section>
 </div>
 
@@ -109,10 +108,11 @@ import { Collections } from "../../lexgi.mjs";
   section.dashboard-blocks {
     display: flex;
     gap: 1.6rem;
+    margin-bottom: 1.5rem;
   }
 
   .dashboard-block {
-    flex: auto;
+    flex: 1;
     padding: 0;
     background: #0b0b0b;
     border-radius: 8px;
