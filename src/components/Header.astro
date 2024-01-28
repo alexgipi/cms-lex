@@ -7,7 +7,7 @@ const {breadcumb} = Astro.props;
 ---
 
 <header class="header">
-  <div class="container p-6 py-0">
+  <div class="container flex items-center justify-between p-6 py-0">
     <nav class="flex" aria-label="Breadcrumb">
       <ol
         class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2"
@@ -68,6 +68,33 @@ const {breadcumb} = Astro.props;
         </li>
       </ol>
     </nav>
+    
+    <div data-dropdown-toggle="userDropdown" data-dropdown-placement="bottom-start" class="cursor-pointer relative w-10 h-10 overflow-hidden bg-[#272727] rounded-full">
+      <svg class="absolute w-12 h-12 text-[#8e8e8e] -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+    </div>
+
+    <!-- Dropdown menu -->
+    <div id="userDropdown" class="z-10 hidden bg-white divide-y divide-zinc-100 rounded-lg shadow w-44 dark:bg-zinc-700 dark:divide-zinc-600">
+        <div class="px-4 py-3 text-sm text-zinc-900 dark:text-white">
+          <div>Bonnie Green</div>
+          <div class="font-medium truncate">name@flowbite.com</div>
+        </div>
+        <ul class="py-2 text-sm text-zinc-700 dark:text-zinc-200" aria-labelledby="avatarButton">
+          <li>
+            <a href="#" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Dashboard</a>
+          </li>
+          <li>
+            <a href="#" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Settings</a>
+          </li>
+          <li>
+            <a href="#" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Earnings</a>
+          </li>
+        </ul>
+        <div class="py-1">
+          <a href="#" class="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:text-zinc-200 dark:hover:text-white">Sign out</a>
+        </div>
+    </div>
+
   </div>
 </header>
 
