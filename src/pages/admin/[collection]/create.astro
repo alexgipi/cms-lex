@@ -135,7 +135,7 @@ async function getCollectionDocs(collectionSlug:string){
         <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
           
           <header
-            class="page-header sticky top-0 z-50 container p-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+            class="page-header sticky top-0 z-40 container p-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
           >
             <div class="w-full flex justify-between items-center">
               <div class="flex gap-4">
@@ -367,6 +367,23 @@ async function getCollectionDocs(collectionSlug:string){
                                                  
                         </div>
                       }
+
+                      {field?.type === "select" && (
+                        <select
+                          id={field.name}
+                          name={field.name}
+                          class="bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block w-full p-4 dark:bg-[#000] dark:border-[#eeeeee14] dark:placeholder-zinc-400 dark:text-white dark:focus:ring-violet-500 dark:focus:border-violet-500"
+                        >
+                          <option selected>Choose a {field?.name}</option>
+                          
+                          { 
+                            field?.enum.map((option:any) => (
+                              <option value={option}>{option}</option>
+                            ))
+                          }
+                          
+                        </select>
+                      )}
 
                       {field?.type === "richText" && <MyRich name={field.name} client:load></MyRich>}
 
