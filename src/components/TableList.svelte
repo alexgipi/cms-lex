@@ -528,17 +528,17 @@
                                     src={'/image-icon.svg'}
                                   />
                                 {:else}
-                                    {#if key?.relationTo != 'undefined'}
-                                    <img
-                                      class="bg-[#fff] rounded-lg w-[80px]"
-                                      alt="Imágen"
-                                      src={'http://localhost:3500/uploads/' + document[key.name]?.file}
-                                    />
-                                  {:else}
+                                  {#if key?.relationTo === undefined}
                                     <img
                                       class="bg-[#fff] rounded-lg w-[80px]"
                                       alt="Imágen"
                                       src={'http://localhost:3500/uploads/' + document[key.name]}
+                                    />                                    
+                                  {:else}
+                                    <img
+                                      class="bg-[#fff] rounded-lg w-[80px]"
+                                      alt="Imágen"
+                                      src={'http://localhost:3500/uploads/' + document[key.name]?.file}
                                     />
                                   {/if}
                                 {/if}
