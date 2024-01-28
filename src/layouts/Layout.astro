@@ -63,6 +63,7 @@ import { addCollections } from "../../lexgi.mjs";
   body {
     margin: 0;
     min-height: 100vh;
+    overflow: hidden;
   }
   code {
     font-family:
@@ -106,6 +107,8 @@ import { addCollections } from "../../lexgi.mjs";
     width: calc(100% + var(--nav-width));
     transform: translate3d(calc(var(--nav-width) * -1), 0, 0);
     transition: width 0.3s ease,transform 0.3s ease;
+    position: relative;
+    z-index: 50;
   }
 
   .layout.aside-opened {
@@ -116,6 +119,8 @@ import { addCollections } from "../../lexgi.mjs";
   .layout-content {
     flex: auto;
     background: #000000;
+    overflow: auto;
+    height: 100vh;
   }
 
   .toggle-aside-button {
