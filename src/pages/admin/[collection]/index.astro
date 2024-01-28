@@ -74,16 +74,9 @@ if(collection === 'settings'){
         <div class="w-full flex-auto flex flex-col">
           <section class="collection-list flex-auto flex flex-col">
 
-            { (!documents || documents?.length === 0) &&
-              <div class="no-content-section container">
-                <p>No <strong>{collectionName}</strong> found. Either no <span class="capitalize">{collection?.replaceAll('-', ' ')}</span> exist yet or none match the filters you've specified above.</p>
-                <a class="btn" href={collection+'/create'}>Create new <span>{pluralize.singular(collectionName)}</span></a>
-              </div>
-            }
+            <TableList client:only collectionFields={collectionFields} collectionName={collectionName} collection={collection} documents={documents}></TableList>
+            
 
-            { documents?.length > 0 &&
-              <TableList client:only collectionFields={collectionFields} collectionName={collectionName} collection={collection} documents={documents}></TableList>
-            }
           </section>   
         </div>
       </main>
@@ -113,29 +106,4 @@ if(collection === 'settings'){
   h1 {
     margin: 0;
   }
-
-  .no-content-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2rem;
-    margin: 3rem 0;
-
-  }
-
-  .no-content-section p {
-      font-size: 0.84em;
-      color: #a7a7a7;
-      margin: 0;
-  }
-
-  .btn {
-      padding: 12px 24px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background: #fff;
-      color: #000;
-      font-weight: 600;
-    }
 </style>
