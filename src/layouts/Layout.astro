@@ -79,7 +79,7 @@ import { addCollections } from "../../lexgi.mjs";
 
   .container {
     width: 100%;
-    max-width: 100%;
+    max-width: 1820px;
     margin: 0 auto;
     padding-left: 3rem;
     padding-right: 3rem;
@@ -111,19 +111,9 @@ import { addCollections } from "../../lexgi.mjs";
     z-index: 50;
   }
 
-  .layout.aside-opened {
-      width: 100%;
-      transform: translate3d(0, 0, 0);
-  }
-
-  .layout-content {
-    flex: auto;
-    background: #000000;
-    overflow: auto;
-    height: 100vh;
-  }
-
   .toggle-aside-button {
+    transform: translateX(var(--nav-width));
+    transition: transform 0.3s ease;
     width: var(--nav-btn-size);
     height: var(--nav-btn-size);
     display: flex;
@@ -134,7 +124,7 @@ import { addCollections } from "../../lexgi.mjs";
     position: fixed;
     top: 27px;
     left: 22px;
-    z-index: 1;
+    z-index: 35;
     cursor: pointer;
     color: #f0f0f0;
     background: #ffffff08;
@@ -142,6 +132,24 @@ import { addCollections } from "../../lexgi.mjs";
     backdrop-filter: blur(7px);
     padding: 8px;
   }
+
+  .layout.aside-opened {
+      width: 100%;
+      transform: translate3d(0, 0, 0);
+  }
+
+  .layout.aside-opened .toggle-aside-button {
+    transform: translateX(0);
+  }
+
+  .layout-content {
+    flex: auto;
+    background: #000000;
+    overflow: auto;
+    height: 100vh;
+  }
+
+
 
   main {
     margin: auto;
