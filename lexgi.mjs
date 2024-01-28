@@ -120,7 +120,7 @@ export function createCollectionEndpoints(collection, router) {
   
         } else {
 
-          if (field.type === 'images'){
+          if (field.type === 'images' || field.type === 'image'){
             const relationToSlug = slugify(field.relationTo);
            
             if(relationToSlug != 'undefined'){
@@ -269,42 +269,6 @@ export function createCollectionEndpoints(collection, router) {
         }
       });
       
-    } else if(collection.slug === 'orders'){
-      // Orders
-      router.get("/orders", isAdmin, async (req, res) => {
-        const orders = await Model.find({});
-
-        // sacar userId de request
-        res.send({
-          orders,
-        });
-      });
-
-      router.get("/orders/user", userExtractor, async (req, res) => {
-        const { userId, userEmail } = req;
-        const orders = await Model.find({ email:userEmail }).sort('-createdAt');
-
-        // sacar userId de request
-        res.send({
-          orders,
-        });
-      });
-
-      router.get("/orders/:orderNumber", userExtractor, async (req, res) => {
-        const { userId, userEmail } = req;
-        const { orderNumber } = req.params;
-
-        console.log(userId)
-
-        const order = await Model.findOne({ email: userEmail, orderNumber });
-
-        console.log(order)
-
-        // sacar userId de request
-        res.send({
-          order,
-        });
-      });
     } else {
       router.post(`/${collection.slug}`, cpUpload, async (req, res) => {
         try {
@@ -373,7 +337,17 @@ export function createCollectionEndpoints(collection, router) {
       
         res.send(documents)
       });
-    
+      
+      if(collection.slug === 'orders'){
+        router.get("/orders/user", userExtractor, async (req, res) => {
+          const { userId, userEmail } = req;
+          const orders = await Model.find({ email:userEmail }).sort('-createdAt');
+  
+          // sacar userId de request
+          res.send(orders);
+        });
+      }
+
       router.get(`/${collection.slug}/:idOrSlug`, async (req, res) => {
         try {
           const { idOrSlug } = req.params;
@@ -382,6 +356,7 @@ export function createCollectionEndpoints(collection, router) {
             $or: [
               { _id: mongoose.Types.ObjectId.isValid(idOrSlug) ? idOrSlug : null },
               { slug: idOrSlug },
+              { orderNumber: idOrSlug}
             ]
           };
 
@@ -398,6 +373,7 @@ export function createCollectionEndpoints(collection, router) {
           res.status(500).send({ error: "Error interno del servidor" });
         }
       });
+      
     
       router.patch(`/${collection.slug}/:idOrSlug`, cpUpload, async (req, res) => {
         try {
@@ -405,40 +381,8 @@ export function createCollectionEndpoints(collection, router) {
           const { name, slug } = req.body;
           const files = req.files;
           let updateData = req.body;
-    
-          if (files) {
-            for (const key of Object.keys(files)) {
-              const fieldFiles = files[key];
-      
-              await Promise.all(
-                fieldFiles.map(async (fieldFile) => {
-                  const newMediaData = {
-                    file: fieldFile.filename,
-                  };
-      
-                  const newMedia = new mongoose.models['media'](newMediaData);
-                  await newMedia.save();
-      
-                  return newMedia._id;
-                })
-              ).then((fileNamesArray) => {
-                const field = collection?.fields.find((field) =>
-                  field.type === 'images' || field.type === 'image' ? field.name === key : false
-                );
-      
-                if (field) {
-                  const multiple = field?.multiple;
-                  if (multiple) {
-                    updateData[key] = fileNamesArray;
-                  } else {
-                    updateData[key] = fileNamesArray[0];
-                  }
-                }
-              });
-            }
-          }
-      
-      
+          const Media = mongoose.models['media'];
+
           const query = {
             $or: [
               { _id: mongoose.Types.ObjectId.isValid(idOrSlug) ? idOrSlug : null },
@@ -451,6 +395,80 @@ export function createCollectionEndpoints(collection, router) {
           } else {
             updateData.slug = slugify(slug)
           }
+    
+          if (files) {
+            
+            for (const key of Object.keys(files)) {
+              const field = collection?.fields.find((field) =>
+                  field.type === 'images' || field.type === 'image' ? field.name === key : false
+              );
+
+              const fieldFiles = files[key];
+      
+              await Promise.all(
+                fieldFiles.map(async (fieldFile) => {
+
+                  if(collection.slug === 'media'){
+                    const updateMediaData = {
+                      file: fieldFile.filename,
+                    }
+
+                    const updatedMediaDoc = await Media.findOneAndUpdate(query, updateMediaData, { new: true });
+
+                    if (!updatedMediaDoc) {
+                      return res.status(404).send({ error: "Error to update media" });
+                    }
+
+                    return updatedMediaDoc._id;
+                    
+                  } else {
+                    const newMediaData = {
+                      file: fieldFile.filename,
+                    };
+
+                    const newMedia = new Media(newMediaData);
+                    await newMedia.save();
+        
+                    return newMedia._id;
+                  }
+      
+                  
+                })
+              ).then((fileNamesArray) => {
+                
+      
+                if (field) {
+                  const multiple = field?.multiple;
+                  
+                  if (multiple) {
+                    // Construir la actualización para hacer push de forma programática
+                    updateData.$push = { [key]: fileNamesArray };
+                  } else {
+                    updateData[key] = fileNamesArray[0];
+                  }
+                }
+              });
+            }
+          }
+
+          console.log({updateData})
+          Object.keys(updateData).forEach(key => {
+            if(key.startsWith('removeFileIds_')){
+              const fieldToPull = key.split('_')[1];
+              const fileIdsToRemove = updateData[key].split(',');
+
+              updateData[fieldToPull] = null;
+
+            } else if( key.startsWith('multiple_removeFileIds_')){
+              const fieldToPull = key.split('_')[2];
+              const fileIdsToRemove = updateData[key].split(',');
+
+              console.log({fieldToPull})
+              console.log({fileIdsToRemove})
+              updateData.$pull = { [fieldToPull]: { $in: fileIdsToRemove } };
+            }
+          });
+         
       
           const updatedDoc = await Model.findOneAndUpdate(query, updateData, { new: true });
 
@@ -462,6 +480,31 @@ export function createCollectionEndpoints(collection, router) {
       
         } catch (error) {
           console.error("Error al actualizar el producto:", error.message);
+          res.status(500).send({ error: "Error interno del servidor" });
+        }
+      });
+
+      router.delete(`/${collection.slug}/:idOrSlug`, async (req, res) => {
+        try {
+          const { idOrSlug } = req.params;
+
+          const query = {
+            $or: [
+              { _id: mongoose.Types.ObjectId.isValid(idOrSlug) ? idOrSlug : null },
+              { slug: idOrSlug },
+            ]
+          };    
+      
+          const removedDoc = await Model.findOneAndDelete(query);
+
+          if (!removedDoc) {
+            return res.status(404).send({ error: "This document not removed" });
+          }
+      
+          res.send({removedDoc});
+      
+        } catch (error) {
+          console.error("Error al eliminar " + collection.slug, error.message);
           res.status(500).send({ error: "Error interno del servidor" });
         }
       });
@@ -519,6 +562,25 @@ export function createCollectionEndpoints(collection, router) {
         }
       });
     }
+
+    if(collection.slug === 'orders'){
+
+    
+      // router.get("/orders/:orderNumber", userExtractor, async (req, res) => {
+      //   const { userId, userEmail } = req;
+      //   const { orderNumber } = req.params;
+
+      //   console.log(userId)
+
+      //   const order = await Model.findOne({ email: userEmail, orderNumber });
+
+      //   if(!order) return res.status(400).send({ok: false, error: 'Order not found'})
+
+      //   // sacar userId de request
+      //   res.send(order);
+      // });
+      
+    } 
 }
 
 function generateRandomString(length) {
