@@ -1,19 +1,34 @@
-<script>
+<script lang="ts">
     export let name = '';
     export let multiple = false;
+    export let files:any = [];
+    export let file:any = null;
+    let selectedFiles:any = [];
+    let removeFilesIds:any = [];
 
-    let selectedFiles = [];
+    
+    if(file){
+      
+        selectedFiles.push({src: 'http://localhost:3500/uploads/' + file.file, id: file._id})
 
-    function handleChange(e) {
+    } else if(files && files?.length > 0){
+        files.forEach((file:any) => {
+            selectedFiles.push({src: 'http://localhost:3500/uploads/' + file.file, id: file._id})
+        });
+    }
+
+
+
+    function handleChange(e:any) {
         const files = e.target.files;
         console.log(files);
 
         // Solo mantener una cola de archivos si la propiedad multiple es true
         if (multiple) {
             // Crear una nueva cola de archivos
-            const newSelectedFiles = [];
+            const newSelectedFiles:any = [];
 
-            Object.values(files).forEach((file) => {
+            Object.values(files).forEach((file:any) => {
                 const src = URL.createObjectURL(file);
                 const newFile = { src, file };
                 console.log(newFile);
@@ -31,17 +46,17 @@
             }
 
             // Actualizar el input de archivos para reflejar la cola completa
-            const input = document.getElementById(name);
+            const input:any = document.getElementById(name);
             if (input) {
                 const newFileList = new DataTransfer();
-                selectedFiles.forEach(file => {
+                selectedFiles.forEach((file:any) => {
                     newFileList.items.add(file.file);
                 });
                 input.files = newFileList.files;
             }
         } else {
             // Si no es múltiple, simplemente asignar los nuevos archivos a selectedFiles
-            selectedFiles = Object.values(files).map(file => ({
+            selectedFiles = Object.values(files).map((file:any) => ({
                 src: URL.createObjectURL(file),
                 file
             }));
@@ -49,22 +64,36 @@
     }
 
 
-    function removeFileHandle(index){
-        selectedFiles = selectedFiles.filter((_, i) => i !== index);
+    function removeFileHandle(index:any){
+        const file = selectedFiles[index];
+        console.log(file)
+        if(file?.id){
+            console.log('tiene id')
+            if(multiple){
+                removeFilesIds = [...removeFilesIds, file.id]
+            }else {
+                removeFilesIds = [...removeFilesIds, file.id]
+            }
+            
+        }
+
+        selectedFiles = selectedFiles.filter((_:any, i:any) => i !== index);
 
         // Crear un nuevo FileList con los archivos restantes
         const newFileList = new DataTransfer();
 
-        selectedFiles.forEach(file => {
+        selectedFiles.forEach((file:any) => {
             newFileList.items.add(file.file);
         });
 
         // Actualizar el input de archivos con el nuevo FileList
-        const input = document.getElementById(name);
+        const input:any = document.getElementById(name);
         if (input) {
             input.files = newFileList.files;
         }
     }
+
+    
 </script>
 
 <div class="upload-field flex items-center justify-center flex-col w-full border-2 border-zinc-300 border-dashed rounded-lg cursor-pointer bg-zinc-50 dark:bg-[#000] hover:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-500">
@@ -89,10 +118,13 @@
                         <svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path d="M11.586 13l-2.293 2.293a1 1 0 0 0 1.414 1.414L13 14.414l2.293 2.293a1 1 0 0 0 1.414-1.414L14.414 13l2.293-2.293a1 1 0 0 0-1.414-1.414L13 11.586l-2.293-2.293a1 1 0 0 0-1.414 1.414L11.586 13z" fill="currentColor" fill-rule="nonzero"></path></svg>
                     </button>
                 </div>
+
             </header>
             <img class="preview-file-img" src={file?.src} alt="">
         </article>
         {/each}
+
+        <input type="hidden" name={multiple ? "multiple_removeFileIds_" + name : "removeFileIds_" + name} bind:value={removeFilesIds}>
     </div>
 </div> 
 
