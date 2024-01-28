@@ -208,9 +208,9 @@
 </script>
 
 <header
-  class="page-header sticky top-0 z-40 container p-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+  class="page-header sticky top-0 z-30 py-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
 >
-  <div class="w-full flex gap-6 justify-between items-center">
+  <div class="container w-full flex gap-6 justify-between items-center">
     <div class="flex gap-4">
       <h1
         class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
