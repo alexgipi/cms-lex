@@ -11,16 +11,14 @@ import MyRich from "../../../components/MyRich.svelte";
 const currentLang = 'es';
 const title = "Lexgi CMS";
 const { collection: collectionSlug, id } = Astro.params;
-console.log({id})
 const document = await getCollectionDocById(id || '');
-console.log({document})
 
 const collection = getCollection(collectionSlug);
 const fields = collection?.fields;
 
 const mainFields: any[] = [];
 const sidebarFields: any[] = [];
-let relationTypeFieldsDocs:any = {};
+const fieldCheckedDocsIds:any = {};
 
 await separateFields(fields);
 
@@ -34,6 +32,9 @@ async function separateFields(fields:any) {
 
     if (field.type === 'relation' && field.relationTo) {
       await addRelationField(field);
+
+      getRelationDocsChecked(field)
+      
     }
   }));
 }
@@ -47,37 +48,6 @@ async function addRelationField(field:any){
   field.docs = docs;
 }
 
-if (Astro.request.method === "POST") {
-  try {
-    console.log("POST")
-    let formData = await Astro.request.formData();
-    console.log(formData)
-    // Crear un nuevo objeto FormData
-    // Crear un nuevo objeto FormData
-    let newFormData = new FormData();
-
-    // Añadir solo los campos que no están vacíos al nuevo objeto FormData
-    for (let [key, value] of formData.entries()) {
-      if(typeof value === 'object' && value?.size === 0 && value.name === 'undefined') {
-        console.log('Es imagen y undefined')
-      } else {
-        if(value != document[key] && value != ''){
-          console.log("Este es distinto: " + value)
-          newFormData.append(key, value);
-        }
-      }
-    }
-
-    // Llamar a la función createDoc con el newFormData
-    await updateDoc(newFormData);
-    return Astro.redirect('/admin/' + collectionSlug)
-
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(error.message);
-    }
-  }
-}
 
 async function updateDoc(formData:any) {
   try {
@@ -133,6 +103,54 @@ async function getCollectionDocById(id:string){
     console.error(error);
   }
 }
+
+function getRelationDocsChecked(field:any){
+  const arrayOfDocs = document[field.name]
+  fieldCheckedDocsIds[field.name] = [];
+  
+  if (field.hasMany){
+    arrayOfDocs.forEach((doc:any) => {
+      fieldCheckedDocsIds[field.name].push(doc._id)
+    });
+  } else {
+    if(arrayOfDocs?._id){
+      fieldCheckedDocsIds[field.name].push(arrayOfDocs._id)
+    }    
+  }
+  
+}
+
+if (Astro.request.method === "POST") {
+  try {
+    console.log("POST")
+    let formData = await Astro.request.formData();
+    console.log(formData)
+    // Crear un nuevo objeto FormData
+    // Crear un nuevo objeto FormData
+    let newFormData = new FormData();
+
+    // Añadir solo los campos que no están vacíos al nuevo objeto FormData
+    for (let [key, value] of formData.entries()) {
+      if(typeof value === 'object' && value?.size === 0 && value.name === 'undefined') {
+        console.log('Es imagen y undefined')
+      } else {
+        if(value != document[key] && value != ''){
+          console.log("Este es distinto: " + value)
+          newFormData.append(key, value);
+        }
+      }
+    }
+
+    // Llamar a la función createDoc con el newFormData
+    await updateDoc(newFormData);
+    return Astro.redirect('/admin/' + collectionSlug)
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
 ---
 
 <Layout title={collectionSlug}>
@@ -162,7 +180,7 @@ async function getCollectionDocById(id:string){
       <main class="main padding-0">
         <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
           <header
-            class="page-header sticky top-0 z-50 container p-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+            class="page-header sticky top-0 z-40 container p-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
           >
             <div class="w-full flex justify-between items-center">
               <div class="flex gap-4">
@@ -243,26 +261,26 @@ async function getCollectionDocById(id:string){
                       {(field?.type === "images" ||
                         field?.type === "image") && (
 
-                        <UploadField client:load name={field.name} multiple={field?.type === "images"}></UploadField>
+                        <UploadField client:load name={field.name} file={!field?.hasMany ? document[field.name] : null} files={field?.hasMany ? document[field.name] : []} multiple={field?.type === "images"}></UploadField>
 
                       )}
 
                       {field?.type === "relation" &&
                         <div class="relative">
                           <button data-dropdown-toggle={field?.name} data-dropdown-placement="bottom" class="w-full justify-between text-white bg-violet-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:bg-zinc-900 dark:hover:bg-violet-700 dark:focus:ring-violet-800" type="button">
-                            Dropdown search 
+                            {fieldCheckedDocsIds[field?.name].length} Selected
                             <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                             </svg>
                           </button>
 
-                          <div id={field?.name} class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-zinc-700">
+                          <div id={field?.name} class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-[#18181b]">
                             <ul class="h-48 p-3 overflow-y-auto text-sm text-zinc-700 dark:text-zinc-200" aria-labelledby="dropdownSearchButton">
                               {field?.docs?.map((doc:any) => (
                                 <li>
                                   <div class="flex items-center ps-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-600">
                                     <input 
-                                    checked={(typeof document[field?.name] === 'string' && document[field?.name] === doc._id) || typeof document[field?.name] === 'object' && document[field?.name].indexOf(doc._id) != -1 } 
+                                    checked={fieldCheckedDocsIds[field?.name]?.indexOf(doc._id) !== -1} 
                                     id={doc._id} 
                                     name={field?.name} 
                                     type="checkbox" 
@@ -367,26 +385,26 @@ async function getCollectionDocById(id:string){
                       {(field?.type === "images" ||
                         field?.type === "image") && (
                         
-                        <UploadField client:load name={field.name} multiple={field?.type === "images"}></UploadField>
+                        <UploadField client:load name={field.name} file={!field?.hasMany ? document[field.name] : null} files={field?.hasMany ? document[field.name] : []} multiple={field?.type === "images"}></UploadField>
 
                       )}
 
                       {field?.type === "relation" &&
                         <div class="relative">
                           <button data-dropdown-toggle={field?.name} data-dropdown-placement="bottom" class="w-full justify-between text-white bg-violet-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:bg-zinc-900 dark:hover:bg-violet-700 dark:focus:ring-violet-800" type="button">
-                            Dropdown search 
+                            {fieldCheckedDocsIds[field?.name].length} Selected
                             <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                             </svg>
                           </button>
 
-                          <div id={field?.name} class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-zinc-700">
+                          <div id={field?.name} class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-[#18181b]">
                             <ul class="h-48 p-3 overflow-y-auto text-sm text-zinc-700 dark:text-zinc-200" aria-labelledby="dropdownSearchButton">
                               {field?.docs?.map((doc:any) => (
                                 <li>
                                   <div class="flex items-center ps-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-600">
                                     <input 
-                                    checked={(typeof document[field?.name] === 'string' && document[field?.name] === doc._id) || typeof document[field?.name] === 'object' && document[field?.name].indexOf(doc._id) != -1 } 
+                                    checked={fieldCheckedDocsIds[field?.name]?.indexOf(doc._id) !== -1} 
                                     id={doc._id} 
                                     name={field?.name} 
                                     type="checkbox" 
@@ -413,6 +431,23 @@ async function getCollectionDocById(id:string){
                         </div>
                       }
 
+                      {field?.type === "select" && (
+                        <select
+                          id={field.name}
+                          name={field.name}
+                          class="bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block w-full p-4 dark:bg-[#000] dark:border-[#eeeeee14] dark:placeholder-zinc-400 dark:text-white dark:focus:ring-violet-500 dark:focus:border-violet-500"
+                        >
+                          <option selected>Choose a {field?.name}</option>
+                          
+                          { 
+                            field?.enum.map((option:any) => (
+                              <option selected={document[field?.name] === option} value={option}>{option}</option>
+                            ))
+                          }
+                          
+                        </select>
+                      )}
+
                       {field?.type === "richText" && <MyRich name={field.name} client:load value={document[field.name]}></MyRich>}
 
                       {field?.type === "boolean" &&
@@ -423,6 +458,7 @@ async function getCollectionDocById(id:string){
                               True
                             </label>
                         </div>
+
                         <div class="flex items-center ps-4 border border-zinc-200 rounded dark:border-zinc-900">
                             <input checked={!document[field.name]} id="bordered-radio-2" type="radio" value="false" name={field.name} class="w-4 h-4 text-zinc-600 bg-zinc-100 border-zinc-300 dark:bg-zinc-700 dark:border-zinc-600"/>
                             <label for="bordered-radio-2" class="w-full py-4 ms-2 text-sm font-medium text-zinc-900 dark:text-zinc-300">
