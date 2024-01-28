@@ -120,6 +120,7 @@ export const CollectionsConfig = [
       {
         name: "image",
         type: "image",
+        relationTo: "Media",
         label: {
           es: "Imagen de producto",
           en: "Product Image",
@@ -314,7 +315,8 @@ export const CollectionsConfig = [
       },
       {
         name: "status",
-        type: "text",
+        type: "select",
+        enum: ["pending", "processing", "on-hold", "completed", "cancelled", "refunded", "failed", "checkout-draft"],
         default: "processing",
         options: {
           sidebar: true,
