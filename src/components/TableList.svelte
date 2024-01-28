@@ -479,7 +479,7 @@
 
                   <th
                     scope="col"
-                    class="p-5 text-xs font-medium text-left text-zinc-500 uppercase dark:text-zinc-400"
+                    class="p-3 text-xs font-medium text-left text-zinc-500 uppercase dark:text-zinc-400"
                   >
                     Actions
                   </th>
@@ -510,10 +510,10 @@
                       {#each fieldsToRender as key, index}
                         {#if key?.active}
                         <td
-                          class="max-w-sm p-3 text-base font-normal text-zinc-500 dark:text-zinc-400"
+                          class="max-w-lg p-3 text-base font-normal text-zinc-500 dark:text-zinc-400"
                         >
                           <div
-                            class="text-base font-normal text-balance text-zinc-500 text-sm"
+                            class="min-w-[85px] text-base font-normal text-balance text-zinc-500 text-sm"
                           >
                             {#if key.type === "array"}
                               {#each document[key.name] as item, index}
@@ -546,7 +546,7 @@
                               </div>
                             {:else if key.type === "images"}
                               {#if document[key.name].length > 0}
-                                <div class="flex gap-2">
+                                <div  class="flex gap-2 min-w-[140px]">
                                   {#if key?.relationTo != 'undefined'}
                                     <img
                                       class="bg-[#111] max-h-[80px] object-cover rounded-lg w-[80px]"
@@ -589,13 +589,13 @@
                                   {/each}
                                 </div>
                               {:else}
-                                <span class="line-clamp-2">{document[key.name]?._id || '-'}</span>
+                                <span class="line-clamp-2">{document[key.name]?._id || '<Sin definir>'}</span>
                               {/if}
                               <!-- <span class="line-clamp-2">{@html document[key.name]}</span> -->
                             {:else}
                               
                               {#if document[key.name] === null || document[key.name] === 'undefined'}
-                                <span class="line-clamp-2">-</span>
+                                <span class="line-clamp-2">{'<Sin definir>'}</span>
                                 
                                 {:else if key.name === 'createdAt' || key.name === 'updatedAt'}
                                 <span class="line-clamp-2">{formatDate(document[key.name])}</span>
@@ -617,7 +617,7 @@
                         <a
                           href={collection + "/" + document._id}
                           type="button"
-                          class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-zinc-500 hover:text-zinc-300 transition-colors rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                          class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-zinc-500 hover:text-zinc-300 transition-colors rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-[#131313] dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         >
                           <svg
                             class="w-4 h-4 mr-2"
