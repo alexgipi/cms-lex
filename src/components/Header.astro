@@ -1,99 +1,117 @@
 ---
 interface Props {
-	breadcumb?:string
+  collection?:any,
+	breadcumb?:string,
+  breadcumbAction?:string
 }
 
-const {breadcumb} = Astro.props;
+const {collection, breadcumb, breadcumbAction} = Astro.props;
+
+let identityCookie:any = Astro.cookies.get('identity');
+let identity = null;
+if(identityCookie){
+  identity = JSON.parse(identityCookie.value)
+}
 ---
 
 <header class="header">
   <div class="container flex items-center justify-between p-6 py-0">
     <nav class="flex" aria-label="Breadcrumb">
-      <ol
-        class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2"
-      >
+      <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
         <li class="inline-flex items-center">
-          <a
-            href="#"
-            class="inline-flex items-center text-zinc-700 hover:text-primary-600 dark:text-zinc-300 dark:hover:text-white"
-          >
-            <svg
-              class="w-5 h-5 mr-2.5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-              ><path
-                d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
-              ></path></svg
-            >
-             Home
-          </a>
+            <a href="/admin"
+                class="inline-flex items-center text-zinc-700 hover:text-primary-600 dark:text-zinc-300 dark:hover:text-white">
+                <!-- <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+                    </path>
+                </svg> -->
+                <svg fill="currentColor" class="w-6 h-6 mr-2.5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z"/></svg>
+                Home
+            </a>
         </li>
-        <li>
-          <div class="flex items-center">
-            <svg
-              class="w-6 h-6 text-zinc-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-              ><path
-                fill-rule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clip-rule="evenodd"></path></svg
-            >
-            <a
-              href="#"
-              class="ml-1 text-zinc-700 hover:text-primary-600 md:ml-2 dark:text-zinc-300 dark:hover:text-white"
-              >Users</a
-            >
-          </div>
-        </li>
-        <li>
-          <div class="flex items-center">
-            <svg
-              class="w-6 h-6 text-zinc-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-              ><path
-                fill-rule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clip-rule="evenodd"></path></svg
-            >
-            <span
-              class="ml-1 text-zinc-400 md:ml-2 dark:text-zinc-500"
-              aria-current="page">List</span
-            >
-          </div>
-        </li>
+
+        { collection ?
+          <li>
+              <div class="flex items-center">
+                  <svg class="w-6 h-6 text-zinc-400" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clip-rule="evenodd"></path>
+                  </svg>
+                  <a href={"/admin/" + collection?.slug}
+                      class="ml-1 text-zinc-700 hover:text-primary-600 md:ml-2 dark:text-zinc-300 dark:hover:text-white">{collection?.name}</a>
+              </div>
+          </li>
+
+          <li>
+              <div class="flex items-center">
+                  <svg class="w-6 h-6 text-zinc-400" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clip-rule="evenodd"></path>
+                  </svg>
+                  <span class="ml-1 text-zinc-400 md:ml-2 dark:text-zinc-500" aria-current="page">{breadcumbAction ||
+                      'List'}</span>
+              </div>
+          </li>
+          :
+
+          <li>
+              <div class="flex items-center">
+                  <svg class="w-6 h-6 text-zinc-400" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clip-rule="evenodd"></path>
+                  </svg>
+                  <span
+                      class="ml-1 text-zinc-700 hover:text-primary-600 md:ml-2 dark:text-zinc-300 dark:hover:text-white">Dashboard</span>
+              </div>
+          </li>
+
+        }
       </ol>
     </nav>
     
-    <div data-dropdown-toggle="userDropdown" data-dropdown-placement="bottom-start" class="cursor-pointer relative w-10 h-10 overflow-hidden bg-[#272727] rounded-full">
-      <svg class="absolute w-12 h-12 text-[#8e8e8e] -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-    </div>
+    <div class="flex items-center">
 
-    <!-- Dropdown menu -->
-    <div id="userDropdown" class="z-10 hidden bg-white divide-y divide-zinc-100 rounded-lg shadow w-44 dark:bg-zinc-700 dark:divide-zinc-600">
-        <div class="px-4 py-3 text-sm text-zinc-900 dark:text-white">
-          <div>Bonnie Green</div>
-          <div class="font-medium truncate">name@flowbite.com</div>
+      { !identity &&
+        <a href="/login" class="text-white bg-[#481f7f] hover:bg-[--primary-color] focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+          Iniciar sesión
+        </a>
+      }
+      { identity &&
+        <div data-dropdown-toggle="userDropdown" data-dropdown-placement="bottom-start" class="cursor-pointer relative w-10 h-10 overflow-hidden bg-[#272727] rounded-full">
+          <svg class="absolute w-12 h-12 text-[#8e8e8e] -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
         </div>
-        <ul class="py-2 text-sm text-zinc-700 dark:text-zinc-200" aria-labelledby="avatarButton">
-          <li>
-            <a href="#" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Dashboard</a>
-          </li>
-          <li>
-            <a href="#" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Settings</a>
-          </li>
-          <li>
-            <a href="#" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Earnings</a>
-          </li>
-        </ul>
-        <div class="py-1">
-          <a href="#" class="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:text-zinc-200 dark:hover:text-white">Sign out</a>
+
+        <div id="userDropdown" class="z-10 overflow-hidden hidden bg-white divide-y divide-zinc-100 rounded-lg shadow w-44 dark:bg-zinc-700 dark:divide-zinc-800">
+            <div class="px-4 py-3 text-sm text-zinc-900 dark:text-white">
+              <div>{identity.name || identity.username}</div>
+              <div class="font-medium truncate">{identity.email}</div>
+            </div>
+            <ul class="text-sm text-zinc-700 dark:text-zinc-200" aria-labelledby="avatarButton">
+              <li>
+                <a href="/admin" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Dashboard</a>
+              </li>
+              <li>
+                <a href="#" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Settings</a>
+              </li>
+              <li>
+                <a href="#" class="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:hover:text-white">Earnings</a>
+              </li>
+            </ul>
+            <div>
+              <a href="/logout" class="block px-4 py-3 text-sm text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 dark:text-zinc-200 dark:hover:text-white">Sign out</a>
+            </div>
         </div>
+      }
+
     </div>
+    
 
   </div>
 </header>
