@@ -1,6 +1,5 @@
 import { Users } from "./collections/Users.js";
 import  { Products }  from "./collections/Products.js"
-import { Settings } from "./collections/Settings.js";
 
 export const CollectionsConfig = [
   Users,
