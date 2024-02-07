@@ -1,0 +1,24 @@
+---
+interface Props {
+    name: string | null;
+    value?: string | null;
+    currentValue?: string | null;
+}
+
+const { name, value, currentValue } = Astro.props;
+---
+<div class="boolean-field flex flex-col gap-4">
+    <div class="flex items-center ps-5 border border-zinc-200 rounded-lg dark:border-[#eeeeee14]">
+        <input checked={currentValue} id="boolean-true" type="radio" value="true" name={name} class="dark:ring-white checked:ring-2 focus:ring-0 w-4 h-4 text-zinc-600 bg-zinc-100 border-zinc-300 dark:bg-zinc-700 dark:border-zinc-600"/>
+        <label for="boolean-true" class="w-full py-4 ms-4 text-sm font-medium text-zinc-900 dark:text-zinc-300">
+        True
+        </label>
+    </div>
+    
+    <div class="flex items-center ps-5 border border-zinc-200 rounded-lg dark:border-[#eeeeee14]">
+        <input checked={!currentValue} id="boolean-false" type="radio" value="false" name={name} class="dark:ring-white checked:ring-2 focus:ring-0 w-4 h-4 text-zinc-600 bg-zinc-100 border-zinc-300 dark:bg-zinc-700 dark:border-zinc-600"/>
+        <label for="boolean-false" class="w-full py-4 ms-4 text-sm font-medium text-zinc-900 dark:text-zinc-300">
+        False
+        </label>
+    </div>
+</div>
