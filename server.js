@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 import { handler as ssrHandler } from "./dist/server/entry.mjs";
 import { formatOrderNumber } from "./utils.js";
-import { Collections, createCollectionEndpoints } from "./lexgi.mjs"
+import { Collections, createCollectionEndpoints, createSettingEndpoints, Settings } from "./lexgi.mjs"
 
 import cors from "cors";
 import colors from "colors";
@@ -40,7 +40,11 @@ Object.values(Collections).forEach((collection) => {
   createCollectionEndpoints(collection, collectionRouter);
 });
 
-const OrderModel = mongoose.models['orders'] || mongoose.model('orders', schema);
+Object.values(Settings).forEach((collection) => {
+  createSettingEndpoints(collection, collectionRouter);
+});
+
+const OrderModel = mongoose.models['orders'];
 console.log(OrderModel)
 
 // Stripe
@@ -140,10 +144,12 @@ app.post("/api/create-confirm-intent", async (req, res) => {
 });
 
 app.use(API_PREFIX, collectionRouter);
+
+const server = http.createServer(app)
+
 // Dejar el middleware de manejo de errores al final de todas las rutas.
 app.use(errorHandlerMiddleware);
 
-const server = http.createServer(app)
 
 async function createOrder(order) {
   const newOrder = new OrderModel(order);
