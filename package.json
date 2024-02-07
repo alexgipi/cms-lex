@@ -54,6 +54,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "reload": "^3.2.1",
+    "sharp": "^0.33.2",
     "stripe": "^14.12.0",
     "svelte": "^4.2.8",
     "tailwind-merge": "^2.2.0",
@@ -69,6 +70,10 @@
     "browser-sync": "^3.0.2",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
+    "gulp": "^4.0.2",
+    "gulp-ext-replace": "^0.3.0",
+    "gulp-imagemin": "^9.0.0",
+    "imagemin-webp": "^8.0.0",
     "nodemon": "^3.0.2"
   }
 }
