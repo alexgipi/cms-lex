@@ -1,0 +1,132 @@
+<slot />
+<style is:global>
+  .form {
+    max-width: 550px;
+    padding: 3rem;
+    background: #000000;
+    border-radius: 20px;
+    width: 100%;
+  }
+
+  .form-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    max-width: 100% !important;
+  }
+
+  .form-element {
+    margin-bottom: 1.4rem;
+  }
+
+  .form label {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: #fff;
+  }
+
+  .form label span {
+    font-weight: 500;
+  }
+
+  .form input {
+    padding: 18px;
+    border-radius: 12px;
+    border: none;
+    background: #131313;
+    font-size: 1em;
+    box-shadow: 0 0px 2px #4242424f;
+  }
+
+  .form input::placeholder {
+    color: #646464;
+  }
+
+  .form .invalid {
+    color: #ff0000b5;
+  }
+  .form .invalid input {
+    outline: 2px solid #ff0000b5;
+    background: #ff000012;
+    color: #ff0000b5;
+  }
+
+  .form footer {
+    margin-top: 1.5rem;
+  }
+
+  .form footer button {
+    padding: 16px 40px;
+    background: #fff;
+    color: #000;
+    font-weight: 500;
+    border: none;
+    border-radius: 12px;
+    min-width: 200px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .form-alert {
+    padding: 8px 18px;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.82em;
+    display: inline-flex;
+  }
+
+  .form-alert.error {
+    background: #ff0000b5;
+    color: #fff;
+  }
+
+  .form-alert.success {
+    background: #379663;
+    color: #ffffff;
+  }
+
+  .form a {
+    text-decoration: underline;
+    color: #fff;
+    font-size: 0.9em;
+    font-weight: 500;
+  }
+
+  p.field-error {
+    margin-top: 12px;
+    color: red;
+    font-size: 0.9em;
+  }
+
+  .secondary-nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .secondary-nav li {
+    list-style: none;
+  }
+
+  .secondary-nav li a {
+    color: #999;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .secondary-nav li a.active {
+    color: #fff;
+  }
+
+  .secondary-nav li a.active::after {
+    content: "";
+    position: absolute;
+    bottom: -14px;
+    left: 0;
+    height: 4px;
+    background: #fff;
+    width: 35px;
+  }
+</style>
