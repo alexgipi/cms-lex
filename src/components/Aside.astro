@@ -1,14 +1,47 @@
 ---
-import { Collections } from "../../lexgi.mjs";
+import { Collections, Settings } from "../../lexgi.mjs";
+import { API_URL } from "../../consts";
+
+const UPLOADS_URL = "http://localhost:3500/uploads/"
 
 const title = "Lexgi CMS";
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.slice(1);
+const settings:any = Settings;
+
+const lexiSettings = await getCollectionDoc();
+
+const sitelogo = lexiSettings?.sitelogo;
+
+let siteLogoSrc = '/lexi-cms-logo.png';
+
+if(sitelogo?.file){
+  siteLogoSrc = UPLOADS_URL + sitelogo.file
+}
+
+async function getCollectionDoc(){
+  try {
+    const res = await fetch(API_URL + 'settings/lexi-settings', 
+      {
+          method: "GET",
+      }
+    );
+
+    const data = await res.json();
+
+    return data;
+
+  } catch (error) {
+    console.error(error);
+  }
+}
 ---
 
 <aside class="aside aside-opened">
   <header class="aside-header">
-    <div class="aside-header-content">Lexgi CMS</div>
+    <div class="aside-header-content">
+      <img class="site-logo" alt={"Logo de " + lexiSettings?.sitename} src={siteLogoSrc} data-astro-source-loc="99:12">
+    </div>
   </header>
 
   <nav class="nav">
@@ -22,16 +55,29 @@ const currentPath = pathname.slice(1);
         >
           Dashboard
         </a>
-        <a
-          class={currentPath === `admin/settings`
-            ? "active nav-block-item"
-            : "nav-block-item"}
-          href={"/admin/settings"}
+        <div
+          class={currentPath === `admin/settings` ? "active nav-block-item" : "nav-block-item"}
+          aria-controls="dropdown-example" data-collapse-toggle="dropdown-example"
         >
           Settings
-        </a>
+          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"></path>
+          </svg>
+        </div>
+
+        <ul id="dropdown-example" class="aside-submenu hidden py-2 space-y-2">
+          { 
+            Object.values(settings).map((setting:any) => (
+              <li class="flex flex-col">
+                <a href={'/admin/settings/'+setting.slug}>{setting?.name}</a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
     </div>
+
+
 
     <div class="nav-block">
       <button class="nav-block-label"> Collections</button>
@@ -57,6 +103,12 @@ const currentPath = pathname.slice(1);
 </aside>
 
 <style>
+
+  .aside .site-logo {
+    height: auto;
+    width: 140px;
+    max-height: 60px;
+  }
   .aside {
     display: flex;
     flex-direction: column;
@@ -89,6 +141,7 @@ const currentPath = pathname.slice(1);
     top: 0;
     background: #000;
     min-height: 90px;
+    height: 90px;
   }
 
   .aside-header-content {
@@ -130,10 +183,26 @@ const currentPath = pathname.slice(1);
     text-decoration: none;
     border-left: 2px solid #151515;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
 
     &.active {
       color: #9948ff;
       border-color: #924beb;
     }
+  }
+
+  .aside-submenu {
+    padding-left: 8px
+  }
+
+  .aside-submenu li {
+    color: #888;
+  }
+
+  .aside-submenu li a {
+    padding: 4px 10px;
   }
 </style>
