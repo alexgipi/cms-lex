@@ -154,7 +154,7 @@ async function createUser(email:string, password:string){
         <FormLayout>
           <!-- <FormRegister client:load></FormRegister> -->
 
-          <form method="POST" class="form login-form">
+          <form method="POST" enctype="multipart/form-data" class="form login-form">
             <img class="h-[30px] mb-7" src="/lexi-cms-logo.png">
             <nav class="secondary-nav mb-2">
               <li> 
