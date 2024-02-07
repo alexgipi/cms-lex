@@ -3,23 +3,21 @@ import Layout from "../../../layouts/Layout.astro";
 import Aside from "../../../components/Aside.astro";
 import Header from "../../../components/Header.astro";
 import TableList from "../../../components/TableList.svelte"
-import pluralize from 'pluralize';
 import { Collections } from "../../../../lexgi.mjs";
 import { capitalizeFirstLetter } from "../../../../utils.js"
 import { API_URL } from "../../../../consts";
 
 const title = "Lexgi CMS";
 const { collection } = Astro.params;
-const cols:any = Collections;
+const collections:any = Collections;
 
 const collectionName = capitalizeFirstLetter(collection?.replaceAll('-', ' ')) || null;
 
 let documents = [];
-let keysClean: string[] = []
 let collectionFields: any;
 
 if(collection){
-  collectionFields = cols[collection]?.fields;
+  collectionFields = collections[collection]?.fields;
 }
 
 async function getDocuments(){
@@ -32,15 +30,6 @@ if(collection === 'settings'){
 
 }else {
   documents = await getDocuments();
-  // Si tienes al menos un documento en el array
-  if (documents?.length > 0) {
-    // Obtiene las claves del primer documento (suponiendo que todos los documentos tienen las mismas claves)
-    const allKeys = Object.keys(documents[0]);
-    const keysToIgnore = ['__v'];
-    keysClean = allKeys.filter(key => !keysToIgnore.includes(key));
-  } else {
-    
-  }
 }
 ---
 
@@ -69,7 +58,7 @@ if(collection === 'settings'){
     <Aside />
 
     <div class="layout-content">
-      <Header breadcumb={collectionName} />
+      <Header collection={collections[collection || '']} breadcumbAction="List" />
       
       <main class="main">
         <div class="w-full flex-auto flex flex-col">
