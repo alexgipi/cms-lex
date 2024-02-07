@@ -61,7 +61,6 @@
     "@types/pluralize": "^0.0.33",
     "@types/quill": "^2.0.14",
     "browser-sync": "^3.0.2",
-    "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "gulp": "^4.0.2",
     "gulp-ext-replace": "^0.3.0",
