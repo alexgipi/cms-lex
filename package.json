@@ -19,7 +19,6 @@
     "@astrojs/react": "^3.0.9",
     "@astrojs/svelte": "^5.0.2",
     "@astrojs/tailwind": "^5.1.0",
-    "@radix-ui/react-slot": "^1.0.2",
     "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
     "@tinymce/tinymce-svelte": "^2.0.1",
     "@types/express": "^4.17.21",
