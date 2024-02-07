@@ -1,11 +1,27 @@
 ---
 import Card from "../components/Card.astro";
-import { Collections } from "../../lexgi.mjs";
+import { Collections, DashboardConfig } from "../../lexgi.mjs";
 import Chart from "./Chart.astro";
+const API_URL = `http://localhost:3500/api/`;
+
+async function collectionCounter(collectionSlug:string){
+  const response = await fetch(API_URL + collectionSlug + '/count');
+  if(response.ok) {
+    return await response?.json();
+  }
+}
+
+const counters:any = {};
+
+await Promise.all(Object.values(Collections).map(async (collection) => {
+  const data = await collectionCounter(collection.slug);
+  counters[collection.slug] = data.count;
+}));
+
 ---
 
 <div class="container">
-    <h1>Welcome to <span class="text-gradient">Lexgi CMS</span></h1>
+    <h1>Welcome to <span class="text-gradient">{DashboardConfig.title}</span></h1>
     <p class="instructions">
       To get started, open the directory <code>src/pages</code> in your
       project.<br />
@@ -18,8 +34,8 @@ import Chart from "./Chart.astro";
           <Card
             href={'/admin/'+collection.slug}
             title={collection.name}
-            body="Learn how Astro works and explore the official API docs."
-            counter={0}
+            body={"Esta colección tiene " + collection.fields.length + ' campos.'}
+            counter={counters[collection.slug]}
           />
         ))
       }
