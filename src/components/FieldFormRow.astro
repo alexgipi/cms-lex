@@ -1,0 +1,187 @@
+---
+import { capitalizeFirstLetter } from '../../utils';
+import MyRich from './MyRich.svelte';
+import PasswordField from './PasswordField.svelte';
+import UploadField from './UploadField.svelte';
+import BooleanField from './fields/BooleanField.astro';
+import InputField from './fields/InputField.astro';
+import SelectField from './fields/SelectField.astro';
+
+const currentLang = 'es';
+
+interface Props {
+    collection:any,
+	field:any,
+    document?: any,
+    fieldCheckedDocsIds?:any
+}
+
+const { field, document, collection, fieldCheckedDocsIds }:any = Astro.props;
+
+---
+<div class="form-row">
+    <div class={'form-field flex-col gap-6'}>
+      <label for={field?.name}>
+        {
+          () => {
+            if (typeof field?.label === 'object') {
+              const result = field?.label[currentLang]
+              return result
+            } else if (typeof field?.label === 'string') {
+              const result = field?.label;
+              return result
+            } else {
+              return capitalizeFirstLetter(field?.name.replaceAll("_", " ") || '')
+            }
+          }
+        }
+
+        {field?.required && (
+          <span class="required-symbol">*</span>
+        )}
+      </label>
+
+      { collection?.slug === 'users' && field?.type === "password" &&                         
+        <div class="password-update flex flex-col items-start gap-6">
+        
+            <div id="dropdown-example-2" class="hidden w-full">
+                <PasswordField client:load id={field.name} name={field.name} placeholder="Add new password"></PasswordField>
+            </div>
+            <button type="button" class="text-white bg-zinc-700 hover:bg-zinc-900 focus:ring-4 focus:ring-zinc-300 font-medium rounded-lg text-sm px-6 py-3 dark:bg-zinc-900 focus:outline-none dark:focus:ring-zinc-800" aria-controls="dropdown-example-2" data-collapse-toggle="dropdown-example-2">
+                Change password
+            </button>
+        
+        </div>
+      }
+
+      { collection?.slug !== 'users' && field?.type === "password" &&
+
+        <PasswordField client:load id={field.name} name={field.name} value={document[field.name]}></PasswordField>
+      }
+
+      {field?.type === "text" && (
+        <InputField name={field.name} id={field.name} type="text" value={document[field.name]}></InputField>
+      )}
+
+      {field?.type === "number" && (
+        <InputField name={field.name} id={field.name} type="number" value={document[field.name]}></InputField>
+      )}
+
+      {(field?.type === "images" ||
+        field?.type === "image") && (
+
+        <UploadField client:load collection={collection} name={field.name} file={!field?.hasMany ? document[field.name] : null} files={field?.hasMany ? document[field.name] : []} multiple={field?.type === "images"}></UploadField>
+
+      )}
+
+      { field?.type === "select" && 
+        <SelectField id={field.name} name={field.name} options={field?.enum} currentOption={document[field?.name]}></SelectField>
+      }
+      
+      { field?.type === "richText" && 
+        <MyRich client:load name={field.name} value={document[field.name] || ''}></MyRich>
+      }
+
+      {field?.type === "boolean" &&
+        <BooleanField name={field.name} currentValue={document[field.name]}></BooleanField>
+      }
+
+      {field?.type === "relation" &&
+        <div class="relative">
+          <div data-dropdown-toggle={field?.name} data-dropdown-placement="bottom" class="w-full justify-between text-white bg-violet-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:bg-[#000] border dark:border-[#111] dark:hover:bg-[#111] dark:focus:ring-zinc-800">
+            
+            <div class="relation-tags flex">
+              { field?.docs?.map((doc:any) => (
+                fieldCheckedDocsIds[field?.name]?.indexOf(doc._id) !== -1 && (
+                  <span id="badge-dismiss-dark" class="transition-colors cursor-pointer inline-flex items-center px-2 pr-3 py-1 text-sm font-medium text-zinc-800 bg-zinc-100 rounded-[6px] dark:bg-[#191919] dark:text-[#999999] dark:hover:text-white">
+                    <button type="button" class="transition-colors inline-flex items-center p-1 me-2 text-sm text-[currentColor] bg-transparent rounded-[4px] hover:bg-zinc-400 dark:hover:bg-zinc-600" aria-label="Remove">
+                      <svg class="w-2 h-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"></path></svg>
+                    </button>
+                    {doc[field.useAsTitleRelation] || doc?.name || doc?.slug || doc?._id}
+                  </span>
+                )
+                
+              ))}
+            </div>
+
+            <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+            </svg>
+          </div>
+
+          <div id={field?.name} class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-[#000]">
+            <div class="combo-field z-10 hidden flex border border-[#111] w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground" cmdk-root="">
+              <label cmdk-label="" for=":r1vl:" id=":r1vk:" style="position: absolute; width: 1px; height: 1px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"></label>
+              
+              <div class="combo-field-search flex items-center border-b border-[#111] px-5" cmdk-input-wrapper="">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 opacity-50">
+                      <path d="M10 6.5C10 8.433 8.433 10 6.5 10C4.567 10 3 8.433 3 6.5C3 4.567 4.567 3 6.5 3C8.433 3 10 4.567 10 6.5ZM9.30884 10.0159C8.53901 10.6318 7.56251 11 6.5 11C4.01472 11 2 8.98528 2 6.5C2 4.01472 4.01472 2 6.5 2C8.98528 2 11 4.01472 11 6.5C11 7.56251 10.6318 8.53901 10.0159 9.30884L12.8536 12.1464C13.0488 12.3417 13.0488 12.6583 12.8536 12.8536C12.6583 13.0488 12.3417 13.0488 12.1464 12.8536L9.30884 10.0159Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path>
+                  </svg>
+                  <input
+                      class="combo-field-search-input flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="Select new role..." autocomplete="off" autocorrect="off" spellcheck="false"
+                      aria-autocomplete="list" role="combobox" aria-expanded="true" aria-controls=":r1vj:"
+                      aria-labelledby=":r1vk:" id=":r1vl:" type="text" value=""/>
+              </div>
+
+              <div class="max-h-[300px] overflow-y-auto overflow-x-hidden" role="listbox" aria-label="Suggestions">
+                  <div>
+                      <div class="overflow-hidden text-foreground p-1.5" role="presentation">
+                          <div role="group">
+                            { field?.docs?.map((doc:any) => (
+                              <label class="relative cursor-pointer select-none border-none rounded transition-all duration-300 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 teamaspace-y-1 flex items-center justify-between px-4 py-2.5 hover:bg-[#111] hover:pl-6 hover:py-4" role="option">
+                                <div>
+                                  <p>
+                                    {doc[field.useAsTitleRelation] || doc?.name || doc?.slug || doc?._id}
+                                  </p>
+                                  
+                                  { field?.useAsSubtitleRelation &&
+                                    <p class="text-sm text-muted-foreground opacity-40">
+                                      {doc[field.useAsSubtitleRelation]}  
+                                    </p>
+                                  }
+                                </div>
+
+                                <input 
+                                checked={fieldCheckedDocsIds[field?.name]?.indexOf(doc._id) !== -1} 
+                                id={doc._id} 
+                                name={field?.name} 
+                                type="checkbox" 
+                                value={doc._id} 
+                                class="text-violet-500 w-4 h-4 bg-zinc-100 border-zinc-300 rounded focus:ring-violet-500 dark:focus:ring-violet-600 dark:ring-offset-zinc-700 dark:focus:ring-offset-zinc-700 focus:ring-2 dark:bg-zinc-600 dark:border-zinc-500"
+                                />                             
+                              </label>
+                            ))}
+                            
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            
+          </div>
+
+          
+                                
+        </div>
+      }
+    </div>
+  </div>
+
+<style>
+  .combo-field .combo-field-search input.combo-field-search-input {
+    outline: none;
+    box-shadow: none;
+  }
+  .relation-tags {
+    width: calc(100% - 28px);
+    gap: 6px;
+  }
+  .relation-tags span {
+    display: inline;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    background-color: #191919;
+  }
+</style>
