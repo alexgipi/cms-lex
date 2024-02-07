@@ -44,4 +44,4 @@ export function formatDate(dateString) { // date: '2023-12-11T05:22:32.977Z'
     });
   
     return dateFormat.format(date);
-  }
+}
