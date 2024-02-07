@@ -1,0 +1,321 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import Aside from "../../../../components/Aside.astro";
+import Header from "../../../../components/Header.astro";
+import UploadField from "../../../../components/UploadField.svelte";
+import { getSettingCollection } from "../../../../../lexgi.mjs";
+import { capitalizeFirstLetter, slugify } from "../../../../../utils.js"
+import { API_URL } from "../../../../../consts";
+import MyRich from "../../../../components/MyRich.svelte";
+import FieldFormRow from "../../../../components/FieldFormRow.astro";
+
+const currentLang = 'es';
+const title = "Lexgi CMS";
+const { collection: collectionSlug, id } = Astro.params;
+const document = await getCollectionDoc();
+
+const collection = getSettingCollection(collectionSlug);
+const fields = collection?.fields;
+
+const mainFields: any[] = [];
+const sidebarFields: any[] = [];
+const fieldCheckedDocsIds:any = {};
+
+await separateFields(fields);
+
+async function separateFields(fields:any) {
+  await Promise.all(fields.map(async (field:any) => {
+    if (field?.options?.sidebar) {
+      sidebarFields.push(field);
+    } else {
+      mainFields.push(field);
+    }
+
+    if (field.type === 'relation' && field.relationTo) {
+      await addRelationField(field);
+
+      getRelationDocsChecked(field)
+      
+    }
+  }));
+}
+
+async function addRelationField(field:any){
+  const {name, relationTo} = field;
+  const relationToSlug = slugify(relationTo);
+
+  let docs:any = await getCollectionDocs(relationToSlug);
+
+  field.docs = docs;
+}
+
+
+async function updateDoc(formData:any) {
+  try {
+    const res = await fetch(API_URL + 'settings/' + collectionSlug, {
+      method: "PATCH",
+      body: formData
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    // const data = await res.json();
+    // console.log({data})
+
+    // return data;
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getCollectionDocs(collectionSlug:string){
+  try {
+    const res = await fetch(API_URL + collectionSlug, 
+      {
+          method: "GET",
+      }
+    );
+
+    const data = await res.json();
+
+    return data;
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getCollectionDoc(){
+  try {
+    const res = await fetch(API_URL + 'settings/' + collectionSlug, 
+      {
+          method: "GET",
+      }
+    );
+
+    const data = await res.json();
+
+    return data;
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function getRelationDocsChecked(field:any){
+  const arrayOfDocs = document[field.name]
+  fieldCheckedDocsIds[field.name] = [];
+  
+  if (field.hasMany){
+    arrayOfDocs.forEach((doc:any) => {
+      fieldCheckedDocsIds[field.name].push(doc._id)
+    });
+  } else {
+    if(arrayOfDocs?._id){
+      fieldCheckedDocsIds[field.name].push(arrayOfDocs._id)
+    }    
+  }
+  
+}
+
+if (Astro.request.method === "POST") {
+  try {
+    console.log("POST")
+    let formData = await Astro.request.formData();
+    console.log(formData)
+    // Crear un nuevo objeto FormData
+    // Crear un nuevo objeto FormData
+    let newFormData = new FormData();
+
+    // Añadir solo los campos que no están vacíos al nuevo objeto FormData
+    for (let [key, value] of formData.entries()) {
+      if(typeof value === 'object' && value?.size === 0 && value.name === 'undefined') {
+        console.log('Es imagen y undefined')
+      } else {
+        if(value != document[key] && value != ''){
+          console.log("Este es distinto: " + value)
+          newFormData.append(key, value);
+        }
+      }
+    }
+
+    // Llamar a la función createDoc con el newFormData
+    await updateDoc(newFormData);
+    return Astro.redirect('/admin/settings/' + collectionSlug)
+
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+
+---
+
+<Layout title={collectionSlug}>
+
+  <div class="layout aside-opened">
+    <button class="toggle-aside-button" data-toggle-nav id="toggle-nav">
+      <svg
+        class="icon-open-menu"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <Aside />
+    <div class="layout-content">
+      <Header collection={collection} breadcumbAction="Update" />
+      <main class="main padding-0">
+        <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
+          <header
+            class="page-header sticky top-0 z-30 py-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+          >
+            <div class="container w-full flex justify-between items-center">
+              <div class="flex gap-4">
+                <h1
+                  class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
+                >
+                  { collection.name }
+                </h1>
+              </div>
+
+              <div class="flex gap-4 items-center">
+                <div class="flex mr-4">
+                  
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" value="" class="sr-only peer">
+                      <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-violet-600"></div>
+                      <span class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300">View API Rest</span>
+                    </label>
+
+                </div>
+                <button type="submit" class="text-white bg-violet-700 hover:bg-violet-900 focus:ring-4 focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-violet-900 focus:outline-none dark:focus:ring-violet-800">
+                  Guardar cambios
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <div class="document-form flex-auto">
+            <div class="document-form__main flex flex-col gap-6">
+              {
+                mainFields.map((field) => (
+                <FieldFormRow collection={collection} field={field} fieldCheckedDocsIds={fieldCheckedDocsIds} document={document}></FieldFormRow>
+                ))
+              }
+              
+            </div>
+            { sidebarFields.length > 0 &&
+            <div class="document-form__aside flex flex-col gap-6">
+              {
+                sidebarFields.map((field) => (
+                <FieldFormRow collection={collection} field={field} fieldCheckedDocsIds={fieldCheckedDocsIds} document={document}></FieldFormRow>
+                ))
+              }
+            </div>
+            }
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const toggleNavBtn = document.querySelector("[data-toggle-nav]");
+  const layout = document.querySelector(".layout");
+  const aside = document.querySelector(".aside");
+
+  // Add event listeners to fire confetti when a button is clicked.
+
+  toggleNavBtn?.addEventListener("click", () => {
+    if (layout?.classList.contains("aside-opened")) {
+      layout?.classList.remove("aside-opened");
+      aside?.classList.remove("aside-opened");
+    } else {
+      layout?.classList.add("aside-opened");
+      aside?.classList.add("aside-opened");
+    }
+  });
+</script>
+
+<style>
+  h1 {
+    margin: 0;
+  }
+
+  .page-header {
+    border-bottom: 1px solid rgb(255 255 255 / 7%);
+  }
+
+  .no-content-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+    margin: 3rem 0;
+
+    & p {
+      font-size: 0.84em;
+      color: #a7a7a7;
+      margin: 0;
+    }
+
+    & button {
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #fff;
+      color: #000;
+      font-weight: 600;
+    }
+  }
+
+  .document-form {
+    display: grid;
+    grid-template-columns: 1fr 490px;
+  }
+
+  .document-form__aside,
+  .document-form__main {
+    flex: auto;
+    padding: 3rem;
+  }
+
+  .document-form__aside {
+    max-width: 490px;
+    border-left: 1px solid rgb(255 255 255 / 7%);
+    width: 100%;
+  }
+
+  .rich-text-editor {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .rich-text-editor header button {
+    background: #252525;
+    padding: 4px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+  }
+  
+</style>
