@@ -2,11 +2,11 @@
 
 const { id } = Astro.props;
 ---
-<div class="w-full bg-white rounded-lg shadow dark:bg-zinc-800 p-4 md:p-6">
+<div class="w-full rounded-lg shadow bg-transparent p-4 md:p-6">
     <div class="flex justify-between mb-5">
       <div>
-        <h5 class="leading-none text-3xl font-bold text-zinc-900 dark:text-white pb-2">$12,423</h5>
-        <p class="text-base font-normal text-zinc-500 dark:text-zinc-400">Sales this week</p>
+        <h5 class="leading-none text-3xl font-bold text-zinc-900 dark:text-white pb-2">428,55 €</h5>
+        <p class="text-base font-normal text-zinc-500 dark:text-zinc-400">Ventas durante los últimos 7 días</p>
       </div>
       <div
         class="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">
@@ -26,7 +26,7 @@ const { id } = Astro.props;
           data-dropdown-placement="bottom"
           class="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 text-center inline-flex items-center dark:hover:text-white"
           type="button">
-          Last 7 days
+          Últimos 7 días
           <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
           </svg>
@@ -89,12 +89,12 @@ const { id } = Astro.props;
         },
         series: [
           {
-            name: "Developer Edition",
+            name: "Sacos térmicos",
             data: [1500, 1418, 1456, 1526, 1356, 1256],
             color: "#1A56DB",
           },
           {
-            name: "Designer Edition",
+            name: "Zapatillas térmicas",
             data: [643, 413, 765, 412, 1423, 1731],
             color: "#7E3BF2",
           },
