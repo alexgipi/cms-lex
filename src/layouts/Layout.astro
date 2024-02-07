@@ -1,11 +1,17 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
+
 interface Props {
   title?: string;
 }
 
 const { title } = Astro.props;
 
-import { addCollections } from "../../lexgi.mjs";
+const customCss = `
+ .site-logo {
+  filter: sepia(1) invert(1) hue-rotate(35deg);
+ }
+`
 ---
 
 <!doctype html>
@@ -27,6 +33,7 @@ import { addCollections } from "../../lexgi.mjs";
 	
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <!-- <ViewTransitions fallback='swap'></ViewTransitions> -->
   </head>
   <body>
     <slot />
@@ -34,6 +41,8 @@ import { addCollections } from "../../lexgi.mjs";
     <script is:inline src="/reload/reload.js"></script>
   </body>
 </html>
+
+
 <style is:global>
 	
   :root {
@@ -62,8 +71,9 @@ import { addCollections } from "../../lexgi.mjs";
   }
   body {
     margin: 0;
-    min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
+    height: 100dvh;
   }
   code {
     font-family:
@@ -242,6 +252,7 @@ import { addCollections } from "../../lexgi.mjs";
   .form-field {
     flex: auto;
     display: flex;
+    width: 100%;
   }
 
   .form-field input:not(input[type="checkbox"]):not(input[type="radio"]),
@@ -267,9 +278,25 @@ import { addCollections } from "../../lexgi.mjs";
     line-height: 1.44;
   }
 
+  .combo-field {
+
+  }
+
   span.required-symbol {
     color: #f44336;
     margin-left: 0.1em;
   }
+
+  .media-modal :is(.dark .dark\:bg-gray-800){
+    background-color: #27272a;
+  }
+
+  :is(.dark .dark\:divide-gray-700)>:not([hidden])~:not([hidden]) {
+    border-color: #343434;
+  }
+
+</style>
+
+<style is:global set:html={customCss}>
 
 </style>
