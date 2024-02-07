@@ -1,0 +1,27 @@
+---
+interface Props {
+    id: string | null;
+    name: string | null;
+    value?: string | null;
+    placeholder?: string | null;
+    options: string[] | number[];
+    currentOption?: string | null;
+}
+
+const { id, name, value, placeholder, options, currentOption } = Astro.props;
+---
+
+<select
+id={id}
+name={name}
+class="bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block w-full p-4 dark:bg-[#000] dark:border-[#eeeeee14] dark:placeholder-zinc-400 dark:text-white dark:focus:ring-violet-500 dark:focus:border-violet-500"
+>
+<option disabled selected>Choose a {name}</option>
+
+{ 
+    options?.map((option:any) => (
+        <option selected={currentOption === option} value={option}>{option}</option>
+    ))
+}
+
+</select>
