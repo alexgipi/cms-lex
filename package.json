@@ -39,7 +39,6 @@
     "flowbite-svelte": "^0.44.22",
     "flowbite-svelte-icons": "^1.0.2",
     "jsonwebtoken": "^9.0.2",
-    "lexical": "^0.12.5",
     "lucide-react": "^0.303.0",
     "mongoose": "^8.0.3",
     "mongoose-autopopulate": "^1.1.0",
