@@ -1,15 +1,39 @@
 <script lang="ts">
+    import MediaModal from "./MediaModal.svelte";
+    export let collection:any = null;
     export let name = '';
     export let multiple = false;
     export let files:any = [];
     export let file:any = null;
     let selectedFiles:any = [];
     let removeFilesIds:any = [];
+    let selectedDocs:any = [];
+    let selectedDocsIds:any = [];
+
+    function handleSelectedMedia(event:any) {
+        selectedDocs = event.detail;
+        console.log("Selected Docs:", selectedDocs);
+        selectedDocs.forEach((sDoc:any) => {
+            selectedDocsIds = [...selectedDocsIds,sDoc._id];
+            const pushData = {src: 'http://localhost:3500/uploads/' + sDoc.file, id: sDoc._id}
+
+            if(multiple){
+                selectedFiles = [...selectedFiles, pushData]
+            } else {
+                selectedFiles = [pushData]
+            }
+        });
+    }
 
     
     if(file){
-      
-        selectedFiles.push({src: 'http://localhost:3500/uploads/' + file.file, id: file._id})
+        console.log(file)
+        
+        if(collection.slug === 'media') {
+            selectedFiles.push({src: 'http://localhost:3500/uploads/' + file, id: file})
+        } else {
+            selectedFiles.push({src: 'http://localhost:3500/uploads/' + file.file, id: file._id})
+        }
 
     } else if(files && files?.length > 0){
         files.forEach((file:any) => {
@@ -96,14 +120,18 @@
     
 </script>
 
+{#if collection?.slug !== 'media'}
+    <MediaModal multiple={multiple} on:select={handleSelectedMedia}></MediaModal>
+{/if}
+
 <div class="upload-field flex items-center justify-center flex-col w-full border-2 border-zinc-300 border-dashed rounded-lg cursor-pointer bg-zinc-50 dark:bg-[#000] hover:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-500">
     <label for={name} class="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer">
         <div class="flex flex-col items-center justify-center pt-6 pb-6">
             <svg class="w-8 h-8 mb-4 text-zinc-500 dark:text-zinc-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
             </svg>
-            <p class="mb-2 text-sm text-zinc-500 dark:text-zinc-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-            <p class="text-xs text-zinc-500 dark:text-zinc-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+            <p class="mb-2 text-sm text-zinc-500 dark:text-zinc-500"><span class="font-semibold">Click para subir una nueva imagen</span></p>
+            <!-- <p class="text-xs text-zinc-500 dark:text-zinc-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p> -->
         </div>
         
         <input on:change={handleChange} name={name} id={name} type="file" class="hidden" multiple={multiple} />
@@ -125,6 +153,7 @@
         {/each}
 
         <input type="hidden" name={multiple ? "multiple_removeFileIds_" + name : "removeFileIds_" + name} bind:value={removeFilesIds}>
+        <input type="hidden" name={multiple ? "multiple_selectedMediaIds_" + name : "selectedMediaIds_" + name} bind:value={selectedDocsIds}>
     </div>
 </div> 
 
@@ -140,6 +169,10 @@
 
   .preview-file {
     position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 8px;
+    background-color: #4b4b4b2e;
   }
 
   .preview-file-header {
