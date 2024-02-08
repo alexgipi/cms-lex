@@ -78,6 +78,10 @@ export const CollectionsConfig = [
   },
   {
     name: "Orders",
+    access: {
+      read: () => false,
+      create: () => true,
+    },
     fields: [
       {
         name: "user",
@@ -330,7 +334,36 @@ export const lexiConfig = {
           },
         },
       ],
-  }
+    },
+    {
+      name: "Email Settings",
+      slug: "email-settings",
+      labels: {
+        en: "Email Settings",
+        es: "Ajustes de emails",
+      },
+      fields: [
+        {
+          name: "client_token",
+          type: "text",
+          required: true,
+          // default: null,
+          label: {
+            es: "Client token",
+            en: "Client token",
+          },
+        },
+        {
+          name: "webhook_secret",
+          type: "password",
+          default: null,
+          label: {
+            es: "Webhook secret",
+            en: "Webhook secret",
+          },
+        },
+      ],
+    }
   ],
   dashboard: {
     title: "El mundo del saquito",
