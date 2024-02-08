@@ -2,12 +2,25 @@
 import Layout from "../../../layouts/Layout.astro";
 import Aside from "../../../components/Aside.astro";
 import Header from "../../../components/Header.astro";
-import UploadField from "../../../components/UploadField.svelte";
 import { getCollection } from "../../../../lexgi.mjs";
-import { capitalizeFirstLetter, slugify } from "../../../../utils.js"
+import { slugify } from "../../../../utils.js"
 import { API_URL } from "../../../../consts";
-import MyRich from "../../../components/MyRich.svelte";
 import FieldFormRow from "../../../components/FieldFormRow.astro";
+
+const identityCookieValue = Astro.cookies.get("identity")?.value;
+
+let identity = null;
+let token: string | null = null;
+
+try {
+  if (identityCookieValue) {
+    identity = JSON.parse(identityCookieValue);
+    token = identity.token;
+  }
+} catch (error) {
+  console.error("Error al analizar el valor de la cookie:", error);
+  // Puedes tomar acciones adicionales aquí, según tus necesidades.
+}
 
 const currentLang = 'es';
 const title = "Lexgi CMS";
@@ -31,7 +44,7 @@ async function separateFields(fields:any) {
       mainFields.push(field);
     }
 
-    if (field.type === 'relation' && field.relationTo) {
+    if (field.relationTo) {
       await addRelationField(field);
 
       getRelationDocsChecked(field)
@@ -39,20 +52,18 @@ async function separateFields(fields:any) {
     }
   }));
 }
-
 async function addRelationField(field:any){
+  
   const {name, relationTo} = field;
   const relationToSlug = slugify(relationTo);
 
   const relationCollection = getCollection(relationToSlug);
-  console.log({relationCollection})
 
   let docs:any = await getCollectionDocs(relationToSlug);
 
   field.docs = docs;
   field.useAsTitleRelation = relationCollection.useAsTitle || 'name';
   field.useAsSubtitleRelation = relationCollection.useAsSubtitle || null;
-  console.log(field)
 }
 
 
@@ -81,7 +92,11 @@ async function getCollectionDocs(collectionSlug:string){
   try {
     const res = await fetch(API_URL + collectionSlug, 
       {
-          method: "GET",
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
       }
     );
 
