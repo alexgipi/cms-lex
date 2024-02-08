@@ -26,7 +26,6 @@ const storage = multer.diskStorage({
         cb(null, `${name}.${extension}`)
     }
 })
-
   
 const upload = multer({ storage: storage })
 
@@ -87,8 +86,6 @@ export let Settings = lexiConfig.settings || {};
 if(lexiConfig.dashboard){
   DashboardConfig = lexiConfig.dashboard;
 }
-
-// console.log(Settings)
 
 const collectionRouter = express.Router();
 
@@ -186,6 +183,30 @@ export function createCollectionEndpoints(collection, router) {
     let newSchema = {};
     let uploadFields = [];
     const cpUpload = upload.fields(uploadFields)
+
+    // Access middlewares
+    const collectionAccess = collection.access;
+    let create_middlewares = [];
+    let read_middlewares = [];
+    let update_middlewares = [];
+    let delete_middlewares = [];
+    
+    if(collectionAccess){
+      if(collectionAccess?.read() != true){
+        read_middlewares.push(userExtractor)
+      }
+
+      if(collectionAccess?.create === undefined){
+        create_middlewares.push(userExtractor)
+      } else {
+        const canCreate = collectionAccess?.create();
+        if(!canCreate) create_middlewares.push(userExtractor);
+      }
+
+    } else {
+      read_middlewares.push(userExtractor)
+      create_middlewares.push(userExtractor)
+    }
   
     if (fields) {
       fields.forEach((field) => {
@@ -262,48 +283,6 @@ export function createCollectionEndpoints(collection, router) {
 
     const Model = mongoose.models[collection.slug] || mongoose.model(collection.slug, schema);
 
-    // if(collection.slug === 'users'){
-    //   // Users
-    //   router.post("/users", cpUpload, async (req, res) => {
-    //     const { email, password } = req.body;
-    //     console.log({body: req.body})
-
-    //     const existingUser = await Model.findOne({ email });
-
-    //     if (existingUser) {
-    //       return res.status(400).send({ ok:false, error: "User already exists" });
-    //     }
-
-    //     const saltRounds = 10;
-    //     const salt = await bcrypt.genSalt(saltRounds);
-    //     const hash = await bcrypt.hash(password, salt);
-
-    //     let newUserName = email.split("@")[0] || null;
-
-    //     const existingUserName = await Model.findOne({ username: newUserName });
-
-    //     if (existingUserName) {
-    //       const randomString = generateRandomString(5);
-    //       newUserName = newUserName + "-" + randomString;
-    //     }
-
-    //     const user = new Model({
-    //       username: newUserName,
-    //       email,
-    //       password: hash,
-    //     });
-
-    //     await user.save();
-
-    //     if (user) {
-    //       res.status(200).send({ ok: true, user, message: 'User created'});
-    //     } else {
-    //       res.status(400).send({ ok: false, error: "Error creating user" });
-    //     }
-    //   });
-      
-    // }
-
     if(collection.auth){
       router.post(`/${collection.slug}/login`, async (req, res) => {
         const { email, password } = req.body;
@@ -351,7 +330,8 @@ export function createCollectionEndpoints(collection, router) {
       });
     }    
 
-    router.post(`/${collection.slug}`, cpUpload, async (req, res) => {
+    create_middlewares.push(cpUpload)
+    router.post(`/${collection.slug}`, create_middlewares, async (req, res) => {
       try {
         const { name, slug } = req.body;
         const files = req.files;
@@ -489,15 +469,7 @@ export function createCollectionEndpoints(collection, router) {
       }
     });
     
-
-    const collectionAccess = collection?.access;
-
-    let read_middlewares = [];
-    
-    if(!collectionAccess?.read()){
-      read_middlewares.push(userExtractor)
-    }
-    
+    console.log(read_middlewares)
     router.get(`/${collection.slug}`, read_middlewares, async (req, res) => {
       const {page, limit} = req.query;
       const skip = ((page || 1) - 1) * (limit || 10);
