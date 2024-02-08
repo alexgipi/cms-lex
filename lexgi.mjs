@@ -106,12 +106,59 @@ export function addCollections(newCollections) {
     newCollection.slug = createSlug(newCollection.name);
     const collectionExists = Collections[newCollection.slug];
 
+    if(newCollection.auth){
+      newCollection.fields = aggregateAuthFields(newCollection.fields)
+    }
+
     Collections[newCollection.slug] = newCollection;
 
     if (!collectionExists) {
       createCollectionEndpoints(newCollection, collectionRouter);
     }
   });
+}
+
+function aggregateAuthFields(fields){
+
+    const existsEmailField = fields.findIndex((field) => field.name === 'email')
+    const existsUsernameField = fields.findIndex((field) => field.name === 'username')
+    const existsPasswordField = fields.findIndex((field) => field.name === 'password')
+
+    if(existsPasswordField === -1){
+      fields.unshift({
+        name: 'password',
+        type: 'password',
+        required: true,
+      })
+    } else {
+      fields[existsPasswordField].required = true
+    }
+
+    if(existsEmailField === -1){
+      fields.unshift({
+        name: 'email',
+        type: 'text',
+        required: true,
+        unique: true,
+      })
+    } else {
+      fields[existsEmailField].required = true
+      fields[existsEmailField].unique = true     
+    }
+
+    if(existsUsernameField === -1){
+      fields.unshift({
+        name: 'username',
+        type: 'text',
+        required: true,
+        unique: true,
+      })
+    } else {
+      fields[existsUsernameField].required = true
+      fields[existsUsernameField].unique = true
+    }
+    
+    return fields;
 }
 
 export async function addSettings(newSettings) {
@@ -138,7 +185,6 @@ export function createCollectionEndpoints(collection, router) {
     const { fields } = collection;
     let newSchema = {};
     let uploadFields = [];
-
     const cpUpload = upload.fields(uploadFields)
   
     if (fields) {
@@ -216,46 +262,50 @@ export function createCollectionEndpoints(collection, router) {
 
     const Model = mongoose.models[collection.slug] || mongoose.model(collection.slug, schema);
 
-    if(collection.slug === 'users'){
-      // Users
-      router.post("/users", async (req, res) => {
-        const { email, password } = req.body;
+    // if(collection.slug === 'users'){
+    //   // Users
+    //   router.post("/users", cpUpload, async (req, res) => {
+    //     const { email, password } = req.body;
+    //     console.log({body: req.body})
 
-        const existingUser = await Model.findOne({ email });
+    //     const existingUser = await Model.findOne({ email });
 
-        if (existingUser) {
-          return res.status(400).send({ ok:false, error: "User already exists" });
-        }
+    //     if (existingUser) {
+    //       return res.status(400).send({ ok:false, error: "User already exists" });
+    //     }
 
-        const saltRounds = 10;
-        const salt = await bcrypt.genSalt(saltRounds);
-        const hash = await bcrypt.hash(password, salt);
+    //     const saltRounds = 10;
+    //     const salt = await bcrypt.genSalt(saltRounds);
+    //     const hash = await bcrypt.hash(password, salt);
 
-        let newUserName = email.split("@")[0] || null;
+    //     let newUserName = email.split("@")[0] || null;
 
-        const existingUserName = await Model.findOne({ username: newUserName });
+    //     const existingUserName = await Model.findOne({ username: newUserName });
 
-        if (existingUserName) {
-          const randomString = generateRandomString(5);
-          newUserName = newUserName + "-" + randomString;
-        }
+    //     if (existingUserName) {
+    //       const randomString = generateRandomString(5);
+    //       newUserName = newUserName + "-" + randomString;
+    //     }
 
-        const user = new Model({
-          username: newUserName,
-          email,
-          password: hash,
-        });
+    //     const user = new Model({
+    //       username: newUserName,
+    //       email,
+    //       password: hash,
+    //     });
 
-        await user.save();
+    //     await user.save();
 
-        if (user) {
-          res.status(200).send({ ok: true, user, message: 'User created'});
-        } else {
-          res.status(400).send({ ok: false, error: "Error creating user" });
-        }
-      });
+    //     if (user) {
+    //       res.status(200).send({ ok: true, user, message: 'User created'});
+    //     } else {
+    //       res.status(400).send({ ok: false, error: "Error creating user" });
+    //     }
+    //   });
+      
+    // }
 
-      router.post("/users/login", async (req, res) => {
+    if(collection.auth){
+      router.post(`/${collection.slug}/login`, async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password)
@@ -274,11 +324,11 @@ export function createCollectionEndpoints(collection, router) {
 
         const userForToken = {
           id: user._id,
-          name: user.name,
+          name: user?.name || null,
           username: user.username,
           email: user.email,
-          role: user.role,
-          address: user.address,
+          role: user?.role || null,
+          address: user?.address || null,
         };
 
         const token = await jwt.sign(userForToken, process.env.SECRET, {
@@ -299,9 +349,8 @@ export function createCollectionEndpoints(collection, router) {
           });
         }
       });
-      
-    }
-    
+    }    
+
     router.post(`/${collection.slug}`, cpUpload, async (req, res) => {
       try {
         const { name, slug } = req.body;
@@ -391,14 +440,44 @@ export function createCollectionEndpoints(collection, router) {
             }
           }
         });
+
+        if(collection.auth){
+          const { email, password } = data;
+
+          const existingUser = await Model.findOne({ email });
+
+          if (existingUser) {
+            return res.status(400).send({ ok:false, error: "User already exists" });
+          }
+
+          const saltRounds = 10;
+          const salt = await bcrypt.genSalt(saltRounds);
+          const hash = await bcrypt.hash(password, salt);
+
+          let newUserName = email.split("@")[0] || null;
+
+          const existingUserName = await Model.findOne({ username: newUserName });
+
+          if (existingUserName) {
+            const randomString = generateRandomString(5);
+            newUserName = newUserName + "-" + randomString;
+          }
+
+          data.username = newUserName;
+          data.email = email;
+          data.password = hash;
+        }
     
         if(collection.slug !== 'media'){
+          
           const newDoc = await new Model(data);
           await newDoc.save();
-      
-          res.send({
-            data: newDoc,
-          });
+
+          if (newDoc) {
+            return res.status(200).send({ data: newDoc, ok: true, message: 'Document created'});
+          } else {
+            return res.status(400).send({ ok: false, error: "Error creating " + collection.name });
+          }
         }
         
       } catch (error) {
@@ -409,8 +488,17 @@ export function createCollectionEndpoints(collection, router) {
         });
       }
     });
-  
-    router.get(`/${collection.slug}`, async (req, res) => {
+    
+
+    const collectionAccess = collection?.access;
+
+    let read_middlewares = [];
+    
+    if(!collectionAccess?.read()){
+      read_middlewares.push(userExtractor)
+    }
+    
+    router.get(`/${collection.slug}`, read_middlewares, async (req, res) => {
       const {page, limit} = req.query;
       const skip = ((page || 1) - 1) * (limit || 10);
     
@@ -572,18 +660,11 @@ export function createCollectionEndpoints(collection, router) {
             
 
           } else if( key.startsWith('multiple_selectedMediaIds_')){
-            console.log("MULTIPLEEEEEEEEEEE")
-            const fieldToUpdate = key.split('_')[1];
+            const fieldToUpdate = key.split('_')[2];
             const fileIdsToAdd = updateData[key].split(',');
-            console.log(fileIdsToAdd)
-            if(updateData[fieldToUpdate] !== undefined) {
-              updateData[fieldToUpdate] = [...updateData[fieldToUpdate], fileIdsToAdd];
-            } else {
-              updateData[fieldToUpdate] = [fileIdsToAdd];
-            }
+            updateData.$push = { [fieldToUpdate]: { $each: fileIdsToAdd } };
           }
         });
-        
     
         const updatedDoc = await Model.findOneAndUpdate(query, updateData, { new: true });
 
