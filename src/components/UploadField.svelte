@@ -1,5 +1,6 @@
 <script lang="ts">
     import MediaModal from "./MediaModal.svelte";
+    export let identity:any = null;
     export let collection:any = null;
     export let name = '';
     export let multiple = false;
@@ -9,6 +10,11 @@
     let removeFilesIds:any = [];
     let selectedDocs:any = [];
     let selectedDocsIds:any = [];
+    let token = null;
+
+    if(identity){
+        token = identity.token;
+    }
 
     function handleSelectedMedia(event:any) {
         selectedDocs = event.detail;
@@ -25,7 +31,6 @@
         });
     }
 
-    
     if(file){
         console.log(file)
         
@@ -40,8 +45,6 @@
             selectedFiles.push({src: 'http://localhost:3500/uploads/' + file.file, id: file._id})
         });
     }
-
-
 
     function handleChange(e:any) {
         const files = e.target.files;
@@ -121,7 +124,7 @@
 </script>
 
 {#if collection?.slug !== 'media'}
-    <MediaModal multiple={multiple} on:select={handleSelectedMedia}></MediaModal>
+    <MediaModal multiple={multiple} identity={identity} on:select={handleSelectedMedia}></MediaModal>
 {/if}
 
 <div class="upload-field flex items-center justify-center flex-col w-full border-2 border-zinc-300 border-dashed rounded-lg cursor-pointer bg-zinc-50 dark:bg-[#000] hover:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-500">
