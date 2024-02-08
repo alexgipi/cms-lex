@@ -7,6 +7,21 @@ import { Collections } from "../../../../lexgi.mjs";
 import { capitalizeFirstLetter } from "../../../../utils.js"
 import { API_URL } from "../../../../consts";
 
+const identityCookieValue = Astro.cookies.get("identity")?.value;
+
+let identity = null;
+let token: string | null = null;
+
+try {
+  if (identityCookieValue) {
+    identity = JSON.parse(identityCookieValue);
+    token = identity.token;
+  }
+} catch (error) {
+  console.error("Error al analizar el valor de la cookie:", error);
+  // Puedes tomar acciones adicionales aquí, según tus necesidades.
+}
+
 const title = "Lexgi CMS";
 const { collection } = Astro.params;
 const collections:any = Collections;
@@ -21,7 +36,14 @@ if(collection){
 }
 
 async function getDocuments(){
-  const response = await fetch(API_URL + collection);
+  const response = await fetch(API_URL + collection, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+  });
+  
   if(response.ok) return await response?.json();
   
 }
