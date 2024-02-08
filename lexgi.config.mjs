@@ -8,6 +8,9 @@ export const CollectionsConfig = [
     name: "Product categories",
     useAsTitle: "name",
     useAsSubtitle: "slug",
+    access: {
+      read: () => true,
+    },
     fields: [
       {
         name: "name",
@@ -50,6 +53,9 @@ export const CollectionsConfig = [
   },
   {
     name: "Product attributes",
+    access: {
+      read: () => true,
+    },
     fields: [
       {
         name: "name",
@@ -222,6 +228,9 @@ export const CollectionsConfig = [
   },
   {
     name: "Menus",
+    access: {
+      read: () => true,
+    },
     fields: [
       {
         name: "name",
@@ -263,6 +272,9 @@ export const CollectionsConfig = [
   },
   {
     name: "Pages",
+    access: {
+      read: () => true,
+    },
     fields: [
       {
         name: "name",
