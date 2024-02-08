@@ -1,6 +1,9 @@
 export const Products = {
     name: "Products",
     useAsTitle: "name",
+    access: {
+      read: () => true,
+    },
     labels: {
       singular: {
         en: "Product",
