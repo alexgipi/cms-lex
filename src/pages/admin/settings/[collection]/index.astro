@@ -67,7 +67,10 @@ async function updateDoc(formData:any) {
   try {
     const res = await fetch(API_URL + 'settings/' + collectionSlug, {
       method: "PATCH",
-      body: formData
+      body: formData,
+      headers: {
+        Authorization: "Bearer " + token,
+      }
     });
 
     if (!res.ok) {
@@ -110,6 +113,10 @@ async function getCollectionDoc(){
     const res = await fetch(API_URL + 'settings/' + collectionSlug, 
       {
           method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
       }
     );
 

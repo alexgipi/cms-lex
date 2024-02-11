@@ -59,7 +59,7 @@ async function addRelationField(field:any){
 
   const relationCollection = getCollection(relationToSlug);
 
-  let docs:any = await getCollectionDocs(relationToSlug);
+  let docs:any = await getCollectionDocs(relationToSlug) || [];
 
   field.docs = docs;
   field.useAsTitleRelation = relationCollection.useAsTitle || 'name';
@@ -71,7 +71,10 @@ async function updateDoc(formData:any) {
   try {
     const res = await fetch(API_URL + collectionSlug + '/' + id, {
       method: "PATCH",
-      body: formData
+      body: formData,
+      headers: {
+        Authorization: "Bearer " + token,
+      }
     });
 
     if (!res.ok) {
@@ -94,7 +97,6 @@ async function getCollectionDocs(collectionSlug:string){
       {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
           Authorization: "Bearer " + token,
         },
       }
@@ -131,7 +133,7 @@ function getRelationDocsChecked(field:any){
   fieldCheckedDocsIds[field.name] = [];
   
   if (field.hasMany){
-    arrayOfDocs.forEach((doc:any) => {
+    arrayOfDocs?.forEach((doc:any) => {
       fieldCheckedDocsIds[field.name].push(doc._id)
     });
   } else {

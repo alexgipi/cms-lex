@@ -91,7 +91,10 @@ async function createDoc(formData: any) {
   try {
     const res = await fetch(API_URL + collectionSlug, {
       method: "POST",
-      body: formData
+      body: formData,
+      headers: {
+        Authorization: "Bearer " + token,
+      }
     });
 
     const data = await res.json();
