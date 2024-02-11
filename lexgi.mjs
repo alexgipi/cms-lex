@@ -185,28 +185,14 @@ export function createCollectionEndpoints(collection, router) {
     const cpUpload = upload.fields(uploadFields)
 
     // Access middlewares
-    const collectionAccess = collection.access;
-    let create_middlewares = [];
-    let read_middlewares = [];
-    let update_middlewares = [];
-    let delete_middlewares = [];
-    
-    if(collectionAccess){
-      if(collectionAccess?.read() != true){
-        read_middlewares.push(userExtractor)
-      }
+    const collectionAccessMiddlewares = getCollectionAccessMiddleares(collection.access);
 
-      if(collectionAccess?.create === undefined){
-        create_middlewares.push(userExtractor)
-      } else {
-        const canCreate = collectionAccess?.create();
-        if(!canCreate) create_middlewares.push(userExtractor);
-      }
-
-    } else {
-      read_middlewares.push(userExtractor)
-      create_middlewares.push(userExtractor)
-    }
+    const { 
+      create_middlewares, 
+      read_middlewares, 
+      update_middlewares, 
+      delete_middlewares 
+    } = collectionAccessMiddlewares;
   
     if (fields) {
       fields.forEach((field) => {
@@ -330,8 +316,7 @@ export function createCollectionEndpoints(collection, router) {
       });
     }    
 
-    create_middlewares.push(cpUpload)
-    router.post(`/${collection.slug}`, create_middlewares, async (req, res) => {
+    router.post(`/${collection.slug}`, [...create_middlewares, cpUpload], async (req, res) => {
       try {
         const { name, slug } = req.body;
         const files = req.files;
@@ -469,25 +454,14 @@ export function createCollectionEndpoints(collection, router) {
       }
     });
     
-    console.log(read_middlewares)
     router.get(`/${collection.slug}`, read_middlewares, async (req, res) => {
       const {page, limit} = req.query;
       const skip = ((page || 1) - 1) * (limit || 10);
     
-      const documents = await Model.find().select("-password");
+      const documents = await Model.find(req.findQuery || {}).select("-password");
     
       res.send(documents)
     });
-    
-    if(collection.slug === 'orders'){
-      router.get("/orders/user", userExtractor, async (req, res) => {
-        const { userId, userEmail } = req;
-        const orders = await Model.find({ email:userEmail }).sort('-createdAt');
-
-        // sacar userId de request
-        res.send(orders);
-      });
-    }
 
     router.get(`/${collection.slug}/count`, async (req, res) => {
       try {
@@ -527,8 +501,8 @@ export function createCollectionEndpoints(collection, router) {
       }
     });
     
-  
-    router.patch(`/${collection.slug}/:idOrSlug`, cpUpload, async (req, res) => {
+    
+    router.patch(`/${collection.slug}/:idOrSlug`, [... update_middlewares, cpUpload], async (req, res) => {
       try {
         const { idOrSlug } = req.params;
         const { name, slug } = req.body;
@@ -652,7 +626,7 @@ export function createCollectionEndpoints(collection, router) {
       }
     });
 
-    router.delete(`/${collection.slug}/:idOrSlug`, async (req, res) => {
+    router.delete(`/${collection.slug}/:idOrSlug`, delete_middlewares, async (req, res) => {
       try {
         const { idOrSlug } = req.params;
 
@@ -742,35 +716,19 @@ export async function createSettingEndpoints(collection, router) {
   // Define un esquema base para la colección "settings"
   const options = { discriminatorKey: 'settingType', timestamps: true };
   const settingSchema = new Schema({}, options);
-  
   settingSchema.plugin(autopopulate);
   
   // Define el modelo base para la colección "settings"
   const SettingsModel = mongoose.models['Settings'] || mongoose.model('Settings', settingSchema);
 
   const { fields } = collection;
-
   let newSchema = {};
-
   let uploadFields = [];
-
   const cpUpload = upload.fields(uploadFields)
 
   if (fields) {
     fields.forEach((field) => {
       
-
-      // if (field?.default) {
-      //   newSchema[field.name].default = null;
-      // } else {
-      //   if (field?.default != undefined){
-      //     newSchema[field.name].default = field.default;
-      //   }else {
-      //     newSchema[field.name].default = null;
-      //   }
-          
-      // }
-
       if(field?.default === null) {
         newSchema[field.name] = {
           type: fieldTypeTypes[field.type].type,
@@ -790,10 +748,6 @@ export async function createSettingEndpoints(collection, router) {
           }
         }
       }
-
-      // if (field.required) {
-      //   newSchema[field.name].required = field.required;
-      // }
       
       if(field.type === 'relation'){         
         const relationToSlug = slugify(field.relationTo);
@@ -915,7 +869,17 @@ export async function createSettingEndpoints(collection, router) {
     console.error(`El discriminador "${modelName}" ya existe.`);
   }
 
-  router.get(`/settings/${collection.slug}`, async (req, res) => {
+  // Access middlewares
+  const collectionAccessMiddlewares = getCollectionAccessMiddleares(collection.access);
+    
+  const { 
+    create_middlewares, 
+    read_middlewares, 
+    update_middlewares, 
+    delete_middlewares 
+  } = collectionAccessMiddlewares;
+
+  router.get(`/settings/${collection.slug}`, read_middlewares, async (req, res) => {
     const {page, limit} = req.query;
     const skip = ((page || 1) - 1) * (limit || 10);
     const Model = mongoose.models[collection.slug];
@@ -927,7 +891,7 @@ export async function createSettingEndpoints(collection, router) {
     res.send(documents[0])
   });
 
-  router.patch(`/settings/${collection.slug}`, cpUpload, async (req, res) => {
+  router.patch(`/settings/${collection.slug}`, [...update_middlewares, cpUpload], async (req, res) => {
     try {
       const { idOrSlug } = req.params;
       const { name, slug } = req.body;
@@ -1035,9 +999,112 @@ export async function createSettingEndpoints(collection, router) {
   
 }
 
-// helperImg("test-uploads/antifazbuhos.jpg", "test-uploads-croped/output.webp", 1280 )
-// cropImages();
-// changeDBFilesExtensions()
+function getCollectionAccessMiddleares(collectionAccess){
+  let create_middlewares = [];
+  let read_middlewares = [];
+  let update_middlewares = [];
+  let delete_middlewares = [];
+  
+  if(collectionAccess){
+
+    if(collectionAccess?.read === undefined){
+      read_middlewares.push(userExtractor)
+    } else {
+      read_middlewares.push((req, res, next) => {
+        const authorization = req.get('authorization');
+        const decodedToken = checkToken(authorization);
+        if(decodedToken) req.user = decodedToken;        
+        const canRead = collectionAccess.read({ req });
+
+        if(typeof canRead === 'boolean'){
+
+          if(canRead) next();
+          else res.status(403).send({message: 'Access denied'});
+
+        } else if (typeof canRead === 'object') {
+          const findQuery = canRead;
+          req.findQuery = findQuery;
+          next()
+        }
+        
+      });
+    }
+
+    if(collectionAccess?.create === undefined){
+      create_middlewares.push(userExtractor)
+    } else {
+      const canCreate = collectionAccess?.create();
+      if(!canCreate) create_middlewares.push(userExtractor);
+    }
+
+    if(collectionAccess?.update === undefined){
+      update_middlewares.push(userExtractor)
+    } else {
+      const canUpdate = collectionAccess?.update();
+      if(!canUpdate) update_middlewares.push(userExtractor);
+    }
+
+    if(collectionAccess?.delete === undefined){
+      delete_middlewares.push(userExtractor)
+      console.log("push delete")
+    } else {
+      const canDelete = collectionAccess?.delete();
+      if(!canDelete) delete_middlewares.push(userExtractor);
+    }
+
+  } else {
+    console.log("GENERAR GENERICOS")
+    read_middlewares.push(userExtractor)
+    create_middlewares.push(userExtractor)
+    update_middlewares.push(userExtractor)
+    delete_middlewares.push(userExtractor)
+  }
+
+  return {
+    create_middlewares,
+    read_middlewares,
+    update_middlewares,
+    delete_middlewares,
+  }
+  
+}
+
+function checkToken(authorization){
+  let token = '';
+
+  if(authorization && authorization.toLowerCase().startsWith('bearer')){
+      token = authorization.substring(7);
+  }
+  
+  if(token) {
+      const decodedToken = jwt.verify(token, process.env.SECRET);
+      console.log("Hay token")
+
+      if(!decodedToken.id) {
+        console.log("No hay token o no es invalido")
+        return false;
+      } else {
+        return decodedToken;
+      }
+      
+  } else {
+    return false;
+  }
+}
+
+function checkAccess(req, res, next) {
+  if (productCategories.access && productCategories.access.read) {
+      // Llama a la función definida en access.read con el objeto req
+      const hasAccess = productCategories.access.read({ req });
+      if (hasAccess) {
+          next(); // Permite continuar con el siguiente middleware o el controlador
+      } else {
+          res.status(403).send('Access denied'); // Si no tiene acceso, devuelve un error 403
+      }
+  } else {
+      next(); // Si no hay reglas de acceso definidas, permite continuar
+  }
+}
 
 const helperImg = (filePath, fileName, size = 300) => {
   return sharp(filePath).metadata().then(metadata => {
