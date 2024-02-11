@@ -314,7 +314,47 @@ export function createCollectionEndpoints(collection, router) {
           });
         }
       });
-    }    
+    }
+
+    const afterHook = (req, res, next) => {
+      // Manejar la respuesta aquí
+      if (req.data) {
+        console.log(req.data)
+        res.status(200).send({ data: req.data, ok: true, message: 'Document created'});
+      } else {
+        res.status(400).send({ ok: false, error: "Error creating " + collection.name });
+      }
+    };
+
+    // router.post(`/${collection.slug}`, [...create_middlewares, cpUpload], async (req, res, next) => {
+    //   try {
+    //     const { name, slug } = req.body;
+    //     const data = req.body;
+    
+    //     if (!slug || slug === undefined) {
+    //       data.slug = slugify(name);
+    //     } else {
+    //       data.slug = slugify(slug);
+    //     }
+    
+    //     const newDoc = await new Model(data).save();
+    
+    //     if (newDoc) {
+    //       req.data = newDoc;
+    //       next(); // Llama al afterHook para manejar la respuesta
+    //     } else {
+    //       req.data = null;
+    //       next(); // Llama al afterHook para manejar la respuesta
+    //     }
+    
+    //   } catch (error) {
+    //     console.error("Error creating " + collection.slug, error.message);
+    //     res.status(500).send({
+    //       error: "Error creating " + collection.slug,
+    //       message: error.message,
+    //     });
+    //   }
+    // }, afterHook);
 
     router.post(`/${collection.slug}`, [...create_middlewares, cpUpload], async (req, res) => {
       try {
@@ -439,7 +479,9 @@ export function createCollectionEndpoints(collection, router) {
           await newDoc.save();
 
           if (newDoc) {
-            return res.status(200).send({ data: newDoc, ok: true, message: 'Document created'});
+            req.data = newDoc;
+            return res.status(200).send({ data: req.data, ok: true, message: 'Document created'});
+            
           } else {
             return res.status(400).send({ ok: false, error: "Error creating " + collection.name });
           }
@@ -1026,7 +1068,7 @@ function getCollectionAccessMiddleares(collectionAccess){
           req.findQuery = findQuery;
           next()
         }
-        
+
       });
     }
 
@@ -1092,20 +1134,6 @@ function checkToken(authorization){
   }
 }
 
-function checkAccess(req, res, next) {
-  if (productCategories.access && productCategories.access.read) {
-      // Llama a la función definida en access.read con el objeto req
-      const hasAccess = productCategories.access.read({ req });
-      if (hasAccess) {
-          next(); // Permite continuar con el siguiente middleware o el controlador
-      } else {
-          res.status(403).send('Access denied'); // Si no tiene acceso, devuelve un error 403
-      }
-  } else {
-      next(); // Si no hay reglas de acceso definidas, permite continuar
-  }
-}
-
 const helperImg = (filePath, fileName, size = 300) => {
   return sharp(filePath).metadata().then(metadata => {
     if (metadata.width && metadata.height) {
@@ -1121,23 +1149,15 @@ const helperImg = (filePath, fileName, size = 300) => {
   });
 }
 
-function cropImages(sizeWidth = 1280){
-  const directorio = './test-uploads-min';
-
-  // Lees el contenido del directorio
-  fs.readdir(directorio, (error, archivos) => {
-    if (error) {
-      console.error('Error al leer el directorio:', error);
-      return;
-    }
-
-    // Imprimes los nombres de archivo
-    console.log('Archivos en el directorio:');
-    archivos.forEach(archivo => {
-      console.log(archivo);
-      helperImg("test-uploads-min/" + archivo, "uploads/thumbnail/" + archivo.replace(archivo.split('.')[1], 'webp'), sizeWidth )
-    });
-  });
+function generateRandomString(length) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomString = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters.charAt(randomIndex);
+  }
+  return randomString;
 }
 
 // cropImages(300);
@@ -1165,39 +1185,23 @@ async function changeDBFilesExtensions(){
   }
 }
 
-async function remplazarFileTelaCojinSobrantes() {
-  const Product = mongoose.models['products'];
-  const products = await Product.find();
+function cropImages(sizeWidth = 1280){
+  const directorio = './test-uploads-min';
 
-  for (const product of products) {
-    for (let index = 0; index < product.images.length; index++) {
-      const image = product.images[index];
-      if (image.file.includes('coixiinterior')) {
-        product.images[index] = '65aee0bcfc192154b8b5401d';
-      }
+  // Lees el contenido del directorio
+  fs.readdir(directorio, (error, archivos) => {
+    if (error) {
+      console.error('Error al leer el directorio:', error);
+      return;
     }
 
-    try {
-      await product.save();
-      console.log(`Documento actualizado: ${product._id}`);
-    } catch (saveErr) {
-      console.error(`Error al guardar el documento ${product._id}:`, saveErr);
-    }
-  }
-}
-
-// remplazarFileTelaCojinSobrantes()
-
-
-function generateRandomString(length) {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let randomString = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    randomString += characters.charAt(randomIndex);
-  }
-  return randomString;
+    // Imprimes los nombres de archivo
+    console.log('Archivos en el directorio:');
+    archivos.forEach(archivo => {
+      console.log(archivo);
+      helperImg("test-uploads-min/" + archivo, "uploads/thumbnail/" + archivo.replace(archivo.split('.')[1], 'webp'), sizeWidth )
+    });
+  });
 }
 
 // Import external images
@@ -1271,5 +1275,3 @@ export async function importExternalImages() {
       console.log({images: updatedProduct.images})
   }
 }
-
-
