@@ -9,7 +9,9 @@ export const CollectionsConfig = [
     useAsTitle: "name",
     useAsSubtitle: "slug",
     access: {
-      read: () => true,
+      read: ({req: {user}}) => {
+        return true
+      },
     },
     fields: [
       {
@@ -79,7 +81,19 @@ export const CollectionsConfig = [
   {
     name: "Orders",
     access: {
-      read: () => false,
+      read: ({req: {user}}) => {
+        if(user){
+          if (user?.role === 'super_admin') {
+            return true;
+          }
+          
+          return {
+            user: user.id
+          }
+        }else {
+          return false
+        }
+      },
       create: () => true,
     },
     fields: [
@@ -309,6 +323,12 @@ export const lexiConfig = {
     {
       name: "Stripe Settings",
       slug: "stripe-settings",
+      access: {
+        read: ({req: {user}}) => {
+          const role = user?.role;
+          return role === 'super_admin';
+        },
+      },
       labels: {
         en: "Stripe Settings",
         es: "Ajustes de Stripe",
@@ -338,6 +358,9 @@ export const lexiConfig = {
     {
       name: "Email Settings",
       slug: "email-settings",
+      access: {
+        read: () => false,
+      },
       labels: {
         en: "Email Settings",
         es: "Ajustes de emails",
