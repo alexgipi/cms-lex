@@ -10,17 +10,18 @@ export default function userExtractor(req, res, next) {
         token = authorization.substring(7);
     }
     
-    const decodedToken = jwt.verify(token, process.env.SECRET);
-    
-    if(!token || !decodedToken.id) {
-        return res.status(401).json({ error: 'token missing or invalid' })
+    if(token && token != ''){
+        const decodedToken = jwt.verify(token, process.env.SECRET);
+        if(!decodedToken.id) {
+            return res.status(401).json({ message: 'Token invalid' });
+            
+        } else {
+            req.user = decodedToken;
+            next();
+        }
+    } else {
+        return res.status(401).json({ message: 'Token missing' });
     }
 
-    const { id: userId, role, email } = decodedToken;
-    req.userId = userId;
-    req.userRole = role;
-    req.userEmail = email;
-
-    next();
 
 }
