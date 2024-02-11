@@ -8,6 +8,20 @@ import { capitalizeFirstLetter, slugify } from "../../../../utils.js"
 import { API_URL } from "../../../../consts";
 import MyRich from "../../../components/MyRich.svelte";
 
+const identityCookieValue = Astro.cookies.get("identity")?.value;
+let identity:any = null;
+let token: string | null = null;
+
+try {
+  if (identityCookieValue) {
+    identity = JSON.parse(identityCookieValue);
+    token = identity.token;
+  }
+} catch (error) {
+  console.error("Error al analizar el valor de la cookie:", error);
+  // Puedes tomar acciones adicionales aquí, según tus necesidades.
+}
+
 const currentLang = 'es';
 const title = "Lexgi CMS";
 const { collection: collectionSlug } = Astro.params;
@@ -77,7 +91,10 @@ async function createDoc(formData: any) {
   try {
     const res = await fetch(API_URL + collectionSlug, {
       method: "POST",
-      body: formData
+      body: formData,
+      headers: {
+        Authorization: "Bearer " + token,
+      }
     });
 
     const data = await res.json();
@@ -93,7 +110,11 @@ async function getCollectionDocs(collectionSlug:string){
   try {
     const res = await fetch(API_URL + collectionSlug, 
       {
-          method: "GET",
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
       }
     );
 
@@ -221,7 +242,7 @@ function fieldLabel(field:any){
                       {(field?.type === "images" ||
                         field?.type === "image") && (
 
-                        <UploadField client:load collection={collection} name={field.name} multiple={field?.type === "images"}></UploadField>
+                        <UploadField client:load identity={identity} collection={collection} name={field.name} multiple={field?.type === "images"}></UploadField>
 
                       )}
 
@@ -339,7 +360,7 @@ function fieldLabel(field:any){
                       {(field?.type === "images" ||
                         field?.type === "image") && (
                         
-                        <UploadField client:load collection={collection} name={field.name} multiple={field?.type === "images"}></UploadField>
+                        <UploadField client:load identity={identity} collection={collection} name={field.name} multiple={field?.type === "images"}></UploadField>
 
                       )}
 

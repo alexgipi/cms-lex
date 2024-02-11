@@ -2,6 +2,7 @@
   import { Button, Modal } from "flowbite-svelte";
   
   export let multiple = false;
+  export let identity = null;
 
   import { createEventDispatcher } from 'svelte';
 
@@ -12,6 +13,11 @@
 
   let modalOpened = false;
   let docs = [];
+  let token = null;
+
+  if(identity){
+    token = identity.token;
+  }
 
   async function init() {
     docs = await getMediaDocs();
@@ -23,9 +29,15 @@
 
   async function getMediaDocs() {
     try {
-      const res = await fetch(API_URL + "media", {
-        method: "GET",
-      });
+      const res = await fetch(API_URL + "media", 
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
 
       const data = await res.json();
 

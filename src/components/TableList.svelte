@@ -12,6 +12,9 @@
   export let collection;
   export let collectionName;
   export let documents = [];
+  export let identity = null;
+  let token;
+
   const API_URL = `http://localhost:3500/api/`;
 
   let modalDeleteDoc = null;
@@ -20,6 +23,8 @@
   let fieldsToRender = [];  
   let limit = 40;
   let foo;
+
+  if(identity?.token) token = identity.token;
 
   const localStorageFields = localStorage.getItem(collection);
   
@@ -191,6 +196,9 @@
     try {
       const res = await fetch(API_URL + collection + '/' + docId, {
         method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + token,
+        }
       });
 
       if (!res.ok) {

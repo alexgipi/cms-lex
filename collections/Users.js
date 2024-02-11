@@ -1,22 +1,11 @@
 export const Users = {
     name: "Users",
     useAsTitle: "email",
+    auth: true,
+    access: {
+      read: () => true,
+    },
     fields: [
-      {
-        name: "username",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "email",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "password",
-        type: "password",
-        required: true,
-      },
       {
         name: "role",
         type: "select",

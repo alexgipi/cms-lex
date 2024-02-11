@@ -8,6 +8,11 @@ export const CollectionsConfig = [
     name: "Product categories",
     useAsTitle: "name",
     useAsSubtitle: "slug",
+    access: {
+      read: ({req: {user}}) => {
+        return true
+      },
+    },
     fields: [
       {
         name: "name",
@@ -50,6 +55,9 @@ export const CollectionsConfig = [
   },
   {
     name: "Product attributes",
+    access: {
+      read: () => true,
+    },
     fields: [
       {
         name: "name",
@@ -72,6 +80,22 @@ export const CollectionsConfig = [
   },
   {
     name: "Orders",
+    access: {
+      read: ({req: {user}}) => {
+        if(user){
+          if (user?.role === 'super_admin') {
+            return true;
+          }
+          
+          return {
+            user: user.id
+          }
+        }else {
+          return false
+        }
+      },
+      create: () => true,
+    },
     fields: [
       {
         name: "user",
@@ -222,6 +246,9 @@ export const CollectionsConfig = [
   },
   {
     name: "Menus",
+    access: {
+      read: () => true,
+    },
     fields: [
       {
         name: "name",
@@ -263,6 +290,9 @@ export const CollectionsConfig = [
   },
   {
     name: "Pages",
+    access: {
+      read: () => true,
+    },
     fields: [
       {
         name: "name",
@@ -293,6 +323,12 @@ export const lexiConfig = {
     {
       name: "Stripe Settings",
       slug: "stripe-settings",
+      access: {
+        read: ({req: {user}}) => {
+          const role = user?.role;
+          return role === 'super_admin';
+        },
+      },
       labels: {
         en: "Stripe Settings",
         es: "Ajustes de Stripe",
@@ -318,7 +354,39 @@ export const lexiConfig = {
           },
         },
       ],
-  }
+    },
+    {
+      name: "Email Settings",
+      slug: "email-settings",
+      access: {
+        read: () => false,
+      },
+      labels: {
+        en: "Email Settings",
+        es: "Ajustes de emails",
+      },
+      fields: [
+        {
+          name: "client_token",
+          type: "text",
+          required: true,
+          // default: null,
+          label: {
+            es: "Client token",
+            en: "Client token",
+          },
+        },
+        {
+          name: "webhook_secret",
+          type: "password",
+          default: null,
+          label: {
+            es: "Webhook secret",
+            en: "Webhook secret",
+          },
+        },
+      ],
+    }
   ],
   dashboard: {
     title: "El mundo del saquito",

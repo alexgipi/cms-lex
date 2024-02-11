@@ -2,6 +2,20 @@
 import { Collections, Settings } from "../../lexgi.mjs";
 import { API_URL } from "../../consts";
 
+const identityCookieValue = Astro.cookies.get("identity")?.value;
+let identity:any = null;
+let token: string | null = null;
+
+try {
+  if (identityCookieValue) {
+    identity = JSON.parse(identityCookieValue);
+    token = identity.token;
+  }
+} catch (error) {
+  console.error("Error al analizar el valor de la cookie:", error);
+  // Puedes tomar acciones adicionales aquí, según tus necesidades.
+}
+
 const UPLOADS_URL = "http://localhost:3500/uploads/"
 
 const title = "Lexgi CMS";
@@ -24,6 +38,9 @@ async function getCollectionDoc(){
     const res = await fetch(API_URL + 'settings/lexi-settings', 
       {
           method: "GET",
+          headers: {
+            Authorization: "Bearer " + token,
+          }
       }
     );
 

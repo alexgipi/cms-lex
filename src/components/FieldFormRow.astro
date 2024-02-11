@@ -7,6 +7,20 @@ import BooleanField from './fields/BooleanField.astro';
 import InputField from './fields/InputField.astro';
 import SelectField from './fields/SelectField.astro';
 
+const identityCookieValue = Astro.cookies.get("identity")?.value;
+let identity = null;
+let token: string | null = null;
+
+try {
+  if (identityCookieValue) {
+    identity = JSON.parse(identityCookieValue);
+    token = identity.token;
+  }
+} catch (error) {
+  console.error("Error al analizar el valor de la cookie:", error);
+  // Puedes tomar acciones adicionales aquí, según tus necesidades.
+}
+
 const currentLang = 'es';
 
 interface Props {
@@ -70,7 +84,7 @@ const { field, document, collection, fieldCheckedDocsIds }:any = Astro.props;
       {(field?.type === "images" ||
         field?.type === "image") && (
 
-        <UploadField client:load collection={collection} name={field.name} file={!field?.hasMany ? document[field.name] : null} files={field?.hasMany ? document[field.name] : []} multiple={field?.type === "images"}></UploadField>
+        <UploadField client:load identity={identity} collection={collection} name={field.name} file={!field?.hasMany ? document[field.name] : null} files={field?.hasMany ? document[field.name] : []} multiple={field?.type === "images"}></UploadField>
 
       )}
 

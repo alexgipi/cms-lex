@@ -26,7 +26,6 @@ const storage = multer.diskStorage({
         cb(null, `${name}.${extension}`)
     }
 })
-
   
 const upload = multer({ storage: storage })
 
@@ -88,8 +87,6 @@ if(lexiConfig.dashboard){
   DashboardConfig = lexiConfig.dashboard;
 }
 
-// console.log(Settings)
-
 const collectionRouter = express.Router();
 
 addCollections(lexiConfig.collections);
@@ -106,12 +103,59 @@ export function addCollections(newCollections) {
     newCollection.slug = createSlug(newCollection.name);
     const collectionExists = Collections[newCollection.slug];
 
+    if(newCollection.auth){
+      newCollection.fields = aggregateAuthFields(newCollection.fields)
+    }
+
     Collections[newCollection.slug] = newCollection;
 
     if (!collectionExists) {
       createCollectionEndpoints(newCollection, collectionRouter);
     }
   });
+}
+
+function aggregateAuthFields(fields){
+
+    const existsEmailField = fields.findIndex((field) => field.name === 'email')
+    const existsUsernameField = fields.findIndex((field) => field.name === 'username')
+    const existsPasswordField = fields.findIndex((field) => field.name === 'password')
+
+    if(existsPasswordField === -1){
+      fields.unshift({
+        name: 'password',
+        type: 'password',
+        required: true,
+      })
+    } else {
+      fields[existsPasswordField].required = true
+    }
+
+    if(existsEmailField === -1){
+      fields.unshift({
+        name: 'email',
+        type: 'text',
+        required: true,
+        unique: true,
+      })
+    } else {
+      fields[existsEmailField].required = true
+      fields[existsEmailField].unique = true     
+    }
+
+    if(existsUsernameField === -1){
+      fields.unshift({
+        name: 'username',
+        type: 'text',
+        required: true,
+        unique: true,
+      })
+    } else {
+      fields[existsUsernameField].required = true
+      fields[existsUsernameField].unique = true
+    }
+    
+    return fields;
 }
 
 export async function addSettings(newSettings) {
@@ -138,8 +182,17 @@ export function createCollectionEndpoints(collection, router) {
     const { fields } = collection;
     let newSchema = {};
     let uploadFields = [];
-
     const cpUpload = upload.fields(uploadFields)
+
+    // Access middlewares
+    const collectionAccessMiddlewares = getCollectionAccessMiddleares(collection.access);
+
+    const { 
+      create_middlewares, 
+      read_middlewares, 
+      update_middlewares, 
+      delete_middlewares 
+    } = collectionAccessMiddlewares;
   
     if (fields) {
       fields.forEach((field) => {
@@ -216,46 +269,8 @@ export function createCollectionEndpoints(collection, router) {
 
     const Model = mongoose.models[collection.slug] || mongoose.model(collection.slug, schema);
 
-    if(collection.slug === 'users'){
-      // Users
-      router.post("/users", async (req, res) => {
-        const { email, password } = req.body;
-
-        const existingUser = await Model.findOne({ email });
-
-        if (existingUser) {
-          return res.status(400).send({ ok:false, error: "User already exists" });
-        }
-
-        const saltRounds = 10;
-        const salt = await bcrypt.genSalt(saltRounds);
-        const hash = await bcrypt.hash(password, salt);
-
-        let newUserName = email.split("@")[0] || null;
-
-        const existingUserName = await Model.findOne({ username: newUserName });
-
-        if (existingUserName) {
-          const randomString = generateRandomString(5);
-          newUserName = newUserName + "-" + randomString;
-        }
-
-        const user = new Model({
-          username: newUserName,
-          email,
-          password: hash,
-        });
-
-        await user.save();
-
-        if (user) {
-          res.status(200).send({ ok: true, user, message: 'User created'});
-        } else {
-          res.status(400).send({ ok: false, error: "Error creating user" });
-        }
-      });
-
-      router.post("/users/login", async (req, res) => {
+    if(collection.auth){
+      router.post(`/${collection.slug}/login`, async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password)
@@ -274,11 +289,11 @@ export function createCollectionEndpoints(collection, router) {
 
         const userForToken = {
           id: user._id,
-          name: user.name,
+          name: user?.name || null,
           username: user.username,
           email: user.email,
-          role: user.role,
-          address: user.address,
+          role: user?.role || null,
+          address: user?.address || null,
         };
 
         const token = await jwt.sign(userForToken, process.env.SECRET, {
@@ -299,10 +314,49 @@ export function createCollectionEndpoints(collection, router) {
           });
         }
       });
-      
     }
+
+    const afterHook = (req, res, next) => {
+      // Manejar la respuesta aquí
+      if (req.data) {
+        console.log(req.data)
+        res.status(200).send({ data: req.data, ok: true, message: 'Document created'});
+      } else {
+        res.status(400).send({ ok: false, error: "Error creating " + collection.name });
+      }
+    };
+
+    // router.post(`/${collection.slug}`, [...create_middlewares, cpUpload], async (req, res, next) => {
+    //   try {
+    //     const { name, slug } = req.body;
+    //     const data = req.body;
     
-    router.post(`/${collection.slug}`, cpUpload, async (req, res) => {
+    //     if (!slug || slug === undefined) {
+    //       data.slug = slugify(name);
+    //     } else {
+    //       data.slug = slugify(slug);
+    //     }
+    
+    //     const newDoc = await new Model(data).save();
+    
+    //     if (newDoc) {
+    //       req.data = newDoc;
+    //       next(); // Llama al afterHook para manejar la respuesta
+    //     } else {
+    //       req.data = null;
+    //       next(); // Llama al afterHook para manejar la respuesta
+    //     }
+    
+    //   } catch (error) {
+    //     console.error("Error creating " + collection.slug, error.message);
+    //     res.status(500).send({
+    //       error: "Error creating " + collection.slug,
+    //       message: error.message,
+    //     });
+    //   }
+    // }, afterHook);
+
+    router.post(`/${collection.slug}`, [...create_middlewares, cpUpload], async (req, res) => {
       try {
         const { name, slug } = req.body;
         const files = req.files;
@@ -391,14 +445,46 @@ export function createCollectionEndpoints(collection, router) {
             }
           }
         });
+
+        if(collection.auth){
+          const { email, password } = data;
+
+          const existingUser = await Model.findOne({ email });
+
+          if (existingUser) {
+            return res.status(400).send({ ok:false, error: "User already exists" });
+          }
+
+          const saltRounds = 10;
+          const salt = await bcrypt.genSalt(saltRounds);
+          const hash = await bcrypt.hash(password, salt);
+
+          let newUserName = email.split("@")[0] || null;
+
+          const existingUserName = await Model.findOne({ username: newUserName });
+
+          if (existingUserName) {
+            const randomString = generateRandomString(5);
+            newUserName = newUserName + "-" + randomString;
+          }
+
+          data.username = newUserName;
+          data.email = email;
+          data.password = hash;
+        }
     
         if(collection.slug !== 'media'){
+          
           const newDoc = await new Model(data);
           await newDoc.save();
-      
-          res.send({
-            data: newDoc,
-          });
+
+          if (newDoc) {
+            req.data = newDoc;
+            return res.status(200).send({ data: req.data, ok: true, message: 'Document created'});
+            
+          } else {
+            return res.status(400).send({ ok: false, error: "Error creating " + collection.name });
+          }
         }
         
       } catch (error) {
@@ -409,25 +495,15 @@ export function createCollectionEndpoints(collection, router) {
         });
       }
     });
-  
-    router.get(`/${collection.slug}`, async (req, res) => {
+    
+    router.get(`/${collection.slug}`, read_middlewares, async (req, res) => {
       const {page, limit} = req.query;
       const skip = ((page || 1) - 1) * (limit || 10);
     
-      const documents = await Model.find().select("-password");
+      const documents = await Model.find(req.findQuery || {}).select("-password");
     
       res.send(documents)
     });
-    
-    if(collection.slug === 'orders'){
-      router.get("/orders/user", userExtractor, async (req, res) => {
-        const { userId, userEmail } = req;
-        const orders = await Model.find({ email:userEmail }).sort('-createdAt');
-
-        // sacar userId de request
-        res.send(orders);
-      });
-    }
 
     router.get(`/${collection.slug}/count`, async (req, res) => {
       try {
@@ -467,8 +543,8 @@ export function createCollectionEndpoints(collection, router) {
       }
     });
     
-  
-    router.patch(`/${collection.slug}/:idOrSlug`, cpUpload, async (req, res) => {
+    
+    router.patch(`/${collection.slug}/:idOrSlug`, [... update_middlewares, cpUpload], async (req, res) => {
       try {
         const { idOrSlug } = req.params;
         const { name, slug } = req.body;
@@ -572,18 +648,11 @@ export function createCollectionEndpoints(collection, router) {
             
 
           } else if( key.startsWith('multiple_selectedMediaIds_')){
-            console.log("MULTIPLEEEEEEEEEEE")
-            const fieldToUpdate = key.split('_')[1];
+            const fieldToUpdate = key.split('_')[2];
             const fileIdsToAdd = updateData[key].split(',');
-            console.log(fileIdsToAdd)
-            if(updateData[fieldToUpdate] !== undefined) {
-              updateData[fieldToUpdate] = [...updateData[fieldToUpdate], fileIdsToAdd];
-            } else {
-              updateData[fieldToUpdate] = [fileIdsToAdd];
-            }
+            updateData.$push = { [fieldToUpdate]: { $each: fileIdsToAdd } };
           }
         });
-        
     
         const updatedDoc = await Model.findOneAndUpdate(query, updateData, { new: true });
 
@@ -599,7 +668,7 @@ export function createCollectionEndpoints(collection, router) {
       }
     });
 
-    router.delete(`/${collection.slug}/:idOrSlug`, async (req, res) => {
+    router.delete(`/${collection.slug}/:idOrSlug`, delete_middlewares, async (req, res) => {
       try {
         const { idOrSlug } = req.params;
 
@@ -689,35 +758,19 @@ export async function createSettingEndpoints(collection, router) {
   // Define un esquema base para la colección "settings"
   const options = { discriminatorKey: 'settingType', timestamps: true };
   const settingSchema = new Schema({}, options);
-  
   settingSchema.plugin(autopopulate);
   
   // Define el modelo base para la colección "settings"
   const SettingsModel = mongoose.models['Settings'] || mongoose.model('Settings', settingSchema);
 
   const { fields } = collection;
-
   let newSchema = {};
-
   let uploadFields = [];
-
   const cpUpload = upload.fields(uploadFields)
 
   if (fields) {
     fields.forEach((field) => {
       
-
-      // if (field?.default) {
-      //   newSchema[field.name].default = null;
-      // } else {
-      //   if (field?.default != undefined){
-      //     newSchema[field.name].default = field.default;
-      //   }else {
-      //     newSchema[field.name].default = null;
-      //   }
-          
-      // }
-
       if(field?.default === null) {
         newSchema[field.name] = {
           type: fieldTypeTypes[field.type].type,
@@ -737,10 +790,6 @@ export async function createSettingEndpoints(collection, router) {
           }
         }
       }
-
-      // if (field.required) {
-      //   newSchema[field.name].required = field.required;
-      // }
       
       if(field.type === 'relation'){         
         const relationToSlug = slugify(field.relationTo);
@@ -862,7 +911,17 @@ export async function createSettingEndpoints(collection, router) {
     console.error(`El discriminador "${modelName}" ya existe.`);
   }
 
-  router.get(`/settings/${collection.slug}`, async (req, res) => {
+  // Access middlewares
+  const collectionAccessMiddlewares = getCollectionAccessMiddleares(collection.access);
+    
+  const { 
+    create_middlewares, 
+    read_middlewares, 
+    update_middlewares, 
+    delete_middlewares 
+  } = collectionAccessMiddlewares;
+
+  router.get(`/settings/${collection.slug}`, read_middlewares, async (req, res) => {
     const {page, limit} = req.query;
     const skip = ((page || 1) - 1) * (limit || 10);
     const Model = mongoose.models[collection.slug];
@@ -874,7 +933,7 @@ export async function createSettingEndpoints(collection, router) {
     res.send(documents[0])
   });
 
-  router.patch(`/settings/${collection.slug}`, cpUpload, async (req, res) => {
+  router.patch(`/settings/${collection.slug}`, [...update_middlewares, cpUpload], async (req, res) => {
     try {
       const { idOrSlug } = req.params;
       const { name, slug } = req.body;
@@ -982,9 +1041,98 @@ export async function createSettingEndpoints(collection, router) {
   
 }
 
-// helperImg("test-uploads/antifazbuhos.jpg", "test-uploads-croped/output.webp", 1280 )
-// cropImages();
-// changeDBFilesExtensions()
+function getCollectionAccessMiddleares(collectionAccess){
+  let create_middlewares = [];
+  let read_middlewares = [];
+  let update_middlewares = [];
+  let delete_middlewares = [];
+  
+  if(collectionAccess){
+
+    if(collectionAccess?.read === undefined){
+      read_middlewares.push(userExtractor)
+    } else {
+      read_middlewares.push((req, res, next) => {
+        const authorization = req.get('authorization');
+        const decodedToken = checkToken(authorization);
+        if(decodedToken) req.user = decodedToken;        
+        const canRead = collectionAccess.read({ req });
+
+        if(typeof canRead === 'boolean'){
+
+          if(canRead) next();
+          else res.status(403).send({message: 'Access denied'});
+
+        } else if (typeof canRead === 'object') {
+          const findQuery = canRead;
+          req.findQuery = findQuery;
+          next()
+        }
+
+      });
+    }
+
+    if(collectionAccess?.create === undefined){
+      create_middlewares.push(userExtractor)
+    } else {
+      const canCreate = collectionAccess?.create();
+      if(!canCreate) create_middlewares.push(userExtractor);
+    }
+
+    if(collectionAccess?.update === undefined){
+      update_middlewares.push(userExtractor)
+    } else {
+      const canUpdate = collectionAccess?.update();
+      if(!canUpdate) update_middlewares.push(userExtractor);
+    }
+
+    if(collectionAccess?.delete === undefined){
+      delete_middlewares.push(userExtractor)
+      console.log("push delete")
+    } else {
+      const canDelete = collectionAccess?.delete();
+      if(!canDelete) delete_middlewares.push(userExtractor);
+    }
+
+  } else {
+    console.log("GENERAR GENERICOS")
+    read_middlewares.push(userExtractor)
+    create_middlewares.push(userExtractor)
+    update_middlewares.push(userExtractor)
+    delete_middlewares.push(userExtractor)
+  }
+
+  return {
+    create_middlewares,
+    read_middlewares,
+    update_middlewares,
+    delete_middlewares,
+  }
+  
+}
+
+function checkToken(authorization){
+  let token = '';
+
+  if(authorization && authorization.toLowerCase().startsWith('bearer')){
+      token = authorization.substring(7);
+  }
+  
+  if(token) {
+      const decodedToken = jwt.verify(token, process.env.SECRET);
+      console.log("Hay token")
+
+      if(!decodedToken.id) {
+        console.log("No hay token o no es invalido")
+        return false;
+      } else {
+        return decodedToken;
+      }
+      
+  } else {
+    return false;
+  }
+}
 
 const helperImg = (filePath, fileName, size = 300) => {
   return sharp(filePath).metadata().then(metadata => {
@@ -1001,23 +1149,15 @@ const helperImg = (filePath, fileName, size = 300) => {
   });
 }
 
-function cropImages(sizeWidth = 1280){
-  const directorio = './test-uploads-min';
-
-  // Lees el contenido del directorio
-  fs.readdir(directorio, (error, archivos) => {
-    if (error) {
-      console.error('Error al leer el directorio:', error);
-      return;
-    }
-
-    // Imprimes los nombres de archivo
-    console.log('Archivos en el directorio:');
-    archivos.forEach(archivo => {
-      console.log(archivo);
-      helperImg("test-uploads-min/" + archivo, "uploads/thumbnail/" + archivo.replace(archivo.split('.')[1], 'webp'), sizeWidth )
-    });
-  });
+function generateRandomString(length) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomString = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters.charAt(randomIndex);
+  }
+  return randomString;
 }
 
 // cropImages(300);
@@ -1045,39 +1185,23 @@ async function changeDBFilesExtensions(){
   }
 }
 
-async function remplazarFileTelaCojinSobrantes() {
-  const Product = mongoose.models['products'];
-  const products = await Product.find();
+function cropImages(sizeWidth = 1280){
+  const directorio = './test-uploads-min';
 
-  for (const product of products) {
-    for (let index = 0; index < product.images.length; index++) {
-      const image = product.images[index];
-      if (image.file.includes('coixiinterior')) {
-        product.images[index] = '65aee0bcfc192154b8b5401d';
-      }
+  // Lees el contenido del directorio
+  fs.readdir(directorio, (error, archivos) => {
+    if (error) {
+      console.error('Error al leer el directorio:', error);
+      return;
     }
 
-    try {
-      await product.save();
-      console.log(`Documento actualizado: ${product._id}`);
-    } catch (saveErr) {
-      console.error(`Error al guardar el documento ${product._id}:`, saveErr);
-    }
-  }
-}
-
-// remplazarFileTelaCojinSobrantes()
-
-
-function generateRandomString(length) {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let randomString = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    randomString += characters.charAt(randomIndex);
-  }
-  return randomString;
+    // Imprimes los nombres de archivo
+    console.log('Archivos en el directorio:');
+    archivos.forEach(archivo => {
+      console.log(archivo);
+      helperImg("test-uploads-min/" + archivo, "uploads/thumbnail/" + archivo.replace(archivo.split('.')[1], 'webp'), sizeWidth )
+    });
+  });
 }
 
 // Import external images
@@ -1151,5 +1275,3 @@ export async function importExternalImages() {
       console.log({images: updatedProduct.images})
   }
 }
-
-

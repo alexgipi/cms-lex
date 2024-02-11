@@ -7,6 +7,21 @@ import { Collections } from "../../../../lexgi.mjs";
 import { capitalizeFirstLetter } from "../../../../utils.js"
 import { API_URL } from "../../../../consts";
 
+const identityCookieValue = Astro.cookies.get("identity")?.value;
+
+let identity = null;
+let token: string | null = null;
+
+try {
+  if (identityCookieValue) {
+    identity = JSON.parse(identityCookieValue);
+    token = identity.token;
+  }
+} catch (error) {
+  console.error("Error al analizar el valor de la cookie:", error);
+  // Puedes tomar acciones adicionales aquí, según tus necesidades.
+}
+
 const title = "Lexgi CMS";
 const { collection } = Astro.params;
 const collections:any = Collections;
@@ -20,59 +35,83 @@ if(collection){
   collectionFields = collections[collection]?.fields;
 }
 
+
 async function getDocuments(){
-  const response = await fetch(API_URL + collection);
-  if(response.ok) return await response?.json();
+  const response = await fetch(API_URL + collection, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+  });
+  
+  return await response?.json();
   
 }
 
+let accessDenied = false;
 if(collection === 'settings'){
 
 }else {
   documents = await getDocuments();
+  if(documents?.message === 'Access denied'){
+    // return Astro.redirect('/')
+    accessDenied = true;
+  }
 }
 ---
 
+
 <Layout title={collectionName}>
-  
+    <div class="layout aside-opened">
+      <button class="toggle-aside-button" data-toggle-nav id="toggle-nav">
+        <svg
+          class="icon-open-menu"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <Aside />
 
-  <div class="layout aside-opened">
-    <button class="toggle-aside-button" data-toggle-nav id="toggle-nav">
-      <svg
-        class="icon-open-menu"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      </svg>
-    </button>
-    <Aside />
+      <div class="layout-content">
+        
+        <Header collection={collections[collection || '']} breadcumbAction="List" />
+        
+        <main class="main">
+          <div class="w-full flex-auto flex flex-col">
+            <section class="collection-list flex-auto flex flex-col">
 
-    <div class="layout-content">
-      <Header collection={collections[collection || '']} breadcumbAction="List" />
-      
-      <main class="main">
-        <div class="w-full flex-auto flex flex-col">
-          <section class="collection-list flex-auto flex flex-col">
+              {accessDenied ?            
+                <div class="container">
+                  <div class="access-denied-alert mt-10">
+                    <p>No tienes acceso a esta página</p>
+                  </div>                  
+                </div>
+                :
+                <TableList client:only identity={identity} collectionFields={collectionFields} collectionName={collectionName} collection={collection} documents={documents}></TableList>
+              }
 
-            <TableList client:only collectionFields={collectionFields} collectionName={collectionName} collection={collection} documents={documents}></TableList>
-            
-
-          </section>   
-        </div>
-      </main>
+            </section>   
+          </div>
+        </main>
+        
+        
+      </div>
     </div>
-  </div>
 </Layout>
+
+
 
 <script>
   const toggleNavBtn = document.querySelector("[data-toggle-nav]");
@@ -95,5 +134,12 @@ if(collection === 'settings'){
 <style>
   h1 {
     margin: 0;
+  }
+
+  .access-denied-alert {
+    padding: 2rem;
+    background: #111;
+    border-radius: 3px;
+    color: #888;
   }
 </style>
