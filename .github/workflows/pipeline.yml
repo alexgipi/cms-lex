@@ -17,4 +17,4 @@ jobs:
         password: ${{ secrets.REMOTE_USER_PASSWORD }}
         script: |
           cd /home/${{ secrets.REMOTE_USER }}
-          mkdir test
+          mkdir hola-deploy
