@@ -6,6 +6,7 @@
   import { Button, Modal } from 'flowbite-svelte';
   import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
   import { formatDate } from "../../utils";
+  import { API_URL } from '../consts.mjs';
   let modalOpened = false;
 
   export let collectionFields = [];
@@ -14,8 +15,6 @@
   export let documents = [];
   export let identity = null;
   let token;
-
-  const API_URL = import.meta.env.PUBLIC_API_URL;
 
   let modalDeleteDoc = null;
 
