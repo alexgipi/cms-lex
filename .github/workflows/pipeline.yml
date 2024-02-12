@@ -46,4 +46,5 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_USER_PASSWORD }}
         script: |
+          cd /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}
           npm install
