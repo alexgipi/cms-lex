@@ -9,14 +9,22 @@ jobs:
   deploy:
     runs-on: ubuntu-20.04
     steps:
-    - name: SSH and deploy node app
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies and Build
+      run: |
+        npm install
+        npm run build
+
+    - name: Copy code to VPS
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_USER_PASSWORD }}
         script: |
-          cd /home/${{ secrets.REMOTE_USER }}
+          rsync -avz --delete ./ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}
 
     - name: Create .env file
       uses: appleboy/ssh-action@master
