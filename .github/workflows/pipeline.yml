@@ -39,3 +39,11 @@ jobs:
           echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" > /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
           echo "SECRET=${{ secrets.SECRET }}" >> /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
           echo "PORT=${{ secrets.PORT }}" >> /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
+    - name: Npm install & restart
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_USER_PASSWORD }}
+        script: |
+          npm install
