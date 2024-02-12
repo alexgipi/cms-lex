@@ -17,8 +17,16 @@ jobs:
         node-version: 18.17.1
     - name: Install dependencies
       run: npm install -f --no-audit --no-fund --no-optional
+    - name: Create .env file
+      run: |
+        echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" > .env
+        echo "SECRET=${{ secrets.SECRET }}" >> .env
+        echo "PORT=${{ secrets.PORT }}" >> .env
+        echo "PUBLIC_API_URL=${{ secrets.PUBLIC_API_URL }}" >> .env
+        echo "PUBLIC_UPLOADS_URL=${{ secrets.PUBLIC_UPLOADS_URL }}" >> .env
     - name: Run build task
-      run: npm run build
+      run: |
+        npm run build
     - name: Deploy to DO Server
       uses: easingthemes/ssh-deploy@main
       env:
@@ -29,18 +37,6 @@ jobs:
         REMOTE_USER: ${{ secrets.REMOTE_USER }}
         TARGET: /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}
         EXCLUDE: "/node_modules/"
-    - name: Create .env file
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.REMOTE_HOST }}
-        username: ${{ secrets.REMOTE_USER }}
-        password: ${{ secrets.REMOTE_USER_PASSWORD }}
-        script: |
-          echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" > /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
-          echo "SECRET=${{ secrets.SECRET }}" >> /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
-          echo "PORT=${{ secrets.PORT }}" >> /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
-          echo "PUBLIC_API_URL=${{ secrets.PUBLIC_API_URL }}" >> /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
-          echo "PUBLIC_UPLOADS_URL=${{ secrets.PUBLIC_UPLOADS_URL }}" >> /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
     - name: Npm install & restart
       uses: appleboy/ssh-action@master
       with:
