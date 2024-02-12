@@ -9,22 +9,16 @@ jobs:
   deploy:
     runs-on: ubuntu-20.04
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Install Dependencies and Build
-      run: |
-        npm install
-        npm run build
-
-    - name: Copy code to VPS
+    - name: Git pull & npm install
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_USER_PASSWORD }}
         script: |
-          rsync -avz --delete ./ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}
+          cd /home/${{ secrets.REMOTE_USER }}
+          git pull
+          npm install
 
     - name: Create .env file
       uses: appleboy/ssh-action@master
