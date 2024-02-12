@@ -1,4 +1,4 @@
-export const API_URL = `http://localhost:${process.env.PORT || 3400}/api/`;
+export const API_URL = `http://localhost:${process.env.PORT || 3500}/api/`;
 export const siteUrl = 'http://localhost:4321';
 
 export const DEFAULT_LEXI_SETTINGS = {

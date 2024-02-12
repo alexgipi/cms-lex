@@ -18,3 +18,14 @@ jobs:
         script: |
           cd /home/${{ secrets.REMOTE_USER }}
           mkdir hola-deploy
+
+    - name: Create .env file
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_USER_PASSWORD }}
+        script: |
+          echo "KEY1=VALUE1" > /home/${{ secrets.REMOTE_USER }}/hola-deploy/.env
+          echo "KEY2=VALUE2" >> /home/${{ secrets.REMOTE_USER }}/hola-deploy/.env
+          echo "KEY3=VALUE3" >> /home/${{ secrets.REMOTE_USER }}/hola-deploy/.env
