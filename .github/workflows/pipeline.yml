@@ -17,4 +17,4 @@ jobs:
         password: elS2807ol16sn!!
         script: |
           cd /home/${{ secrets.REMOTE_USER }}
-          sudo mkdir test
+          echo elS2807ol16sn!! | sudo -S mkdir test
