@@ -5,11 +5,10 @@
   export let identity = null;
 
   import { createEventDispatcher } from 'svelte';
+  import { UPLOADS_URL, API_URL } from "../consts.mjs";
 
   const dispatch = createEventDispatcher();
-  
-  const UPLOADS_URL = "http://localhost:3500/uploads/";
-  const API_URL = "http://localhost:3500/api/";
+
 
   let modalOpened = false;
   let docs = [];

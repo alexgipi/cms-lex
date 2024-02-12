@@ -15,7 +15,7 @@
   export let identity = null;
   let token;
 
-  const API_URL = `http://localhost:3500/api/`;
+  const API_URL = import.meta.env.PUBLIC_API_URL;
 
   let modalDeleteDoc = null;
 

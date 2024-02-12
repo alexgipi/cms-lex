@@ -4,7 +4,7 @@ import Aside from "../../../components/Aside.astro";
 import Header from "../../../components/Header.astro";
 import { getCollection } from "../../../../lexgi.mjs";
 import { slugify } from "../../../../utils.js"
-import { API_URL } from "../../../../consts";
+import { API_URL } from "../../../consts.mjs";
 import FieldFormRow from "../../../components/FieldFormRow.astro";
 
 const identityCookieValue = Astro.cookies.get("identity")?.value;
