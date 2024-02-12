@@ -185,7 +185,7 @@ main()
     console.log(`${formattedDate}`.gray + ` INFO`.green + ' (Lexgi CMS): '.white + 'Connected to MongoDB server successfully!'.blue);
     console.log(`${formattedDate}`.gray + ` INFO`.green + ' (Lexgi CMS): '.white + 'Starting Lexgi CMS...'.blue);
 
-    const port = process.env.PORT || 3400;
+    const port = process.env.PORT || 3500;
   
     reload(app).then(function (reloadReturned) {
       
