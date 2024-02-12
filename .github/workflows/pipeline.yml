@@ -12,7 +12,7 @@ jobs:
     - name: SSH and deploy node app
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.REMOTE_HOST }}
+        host: 164.90.226.115
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_USER_PASSWORD }}
         script: |
