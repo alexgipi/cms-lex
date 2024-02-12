@@ -17,7 +17,6 @@ jobs:
         password: ${{ secrets.REMOTE_USER_PASSWORD }}
         script: |
           cd /home/${{ secrets.REMOTE_USER }}
-          mkdir hola-deploy
 
     - name: Create .env file
       uses: appleboy/ssh-action@master
