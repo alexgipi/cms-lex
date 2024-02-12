@@ -19,6 +19,16 @@ jobs:
       run: npm install -f --no-audit --no-fund --no-optional
     - name: Run build task
       run: npm run build
+    - name: Deploy to DO Server
+      uses: easingthemes/ssh-deploy@main
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        ARGS: "-rltgoDzvO --delete"
+        SOURCE: "./"
+        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+        REMOTE_USER: ${{ secrets.REMOTE_USER }}
+        TARGET: /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}
+        EXCLUDE: "/node_modules/"
     - name: Create .env file
       uses: appleboy/ssh-action@master
       with:
@@ -29,12 +39,3 @@ jobs:
           echo "DATABASE_URI=${{ secrets.DATABASE_URI }}" > /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
           echo "SECRET=${{ secrets.SECRET }}" >> /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
           echo "PORT=${{ secrets.PORT }}" >> /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}/.env
-
-    - name: Copy build files to VPS
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.REMOTE_HOST }}
-        username: ${{ secrets.REMOTE_USER }}
-        password: ${{ secrets.REMOTE_USER_PASSWORD }}
-        script: |
-          scp -r --exclude 'node_modules' ./ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}
