@@ -50,3 +50,4 @@ jobs:
         script: |
           cd /home/${{ secrets.REMOTE_USER }}/${{ secrets.REMOTE_HOST }}
           npm install
+          pm2 restart server
