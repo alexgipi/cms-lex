@@ -1,6 +1,6 @@
 ---
 import { Collections, Settings } from "../../lexgi.mjs";
-import { API_URL } from "../consts.mjs";
+import { API_URL, UPLOADS_URL } from "../consts.mjs";
 
 const identityCookieValue = Astro.cookies.get("identity")?.value;
 let identity:any = null;
@@ -15,8 +15,6 @@ try {
   console.error("Error al analizar el valor de la cookie:", error);
   // Puedes tomar acciones adicionales aquí, según tus necesidades.
 }
-
-const UPLOADS_URL = "http://localhost:3500/uploads/"
 
 const title = "Lexgi CMS";
 const pathname = new URL(Astro.request.url).pathname;
