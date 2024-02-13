@@ -11,6 +11,7 @@ import isAdmin from "./middleware/isAdmin.js";
 import { DEFAULT_LEXI_SETTINGS } from "./consts.js";
 import fs from "fs";
 import sharp from "sharp";
+import { API_URL } from "./consts.js";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -1243,7 +1244,7 @@ export async function importExternalImages() {
                 formData.append('file', fileBlob, fileName); // Ajusta el nombre del archivo según tus necesidades
 
                 // Realizar una solicitud HTTP POST al endpoint de medios en tu servidor
-                const uploadResponse = await fetch('http://localhost:3500/api/media', {
+                const uploadResponse = await fetch(API_URL + 'media', {
                     method: 'POST',
                     body: formData,
                 });

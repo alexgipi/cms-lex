@@ -1,27 +1,28 @@
-<script lang="ts">
+<script lang="js">
     import MediaModal from "./MediaModal.svelte";
-    export let identity:any = null;
-    export let collection:any = null;
+    import { UPLOADS_URL } from "../consts.mjs"
+    export let identity = null;
+    export let collection = null;
     export let name = '';
     export let multiple = false;
-    export let files:any = [];
-    export let file:any = null;
-    let selectedFiles:any = [];
-    let removeFilesIds:any = [];
-    let selectedDocs:any = [];
-    let selectedDocsIds:any = [];
+    export let files = [];
+    export let file = null;
+    let selectedFiles = [];
+    let removeFilesIds = [];
+    let selectedDocs = [];
+    let selectedDocsIds = [];
     let token = null;
 
     if(identity){
         token = identity.token;
     }
 
-    function handleSelectedMedia(event:any) {
+    function handleSelectedMedia(event) {
         selectedDocs = event.detail;
         console.log("Selected Docs:", selectedDocs);
-        selectedDocs.forEach((sDoc:any) => {
+        selectedDocs.forEach((sDoc) => {
             selectedDocsIds = [...selectedDocsIds,sDoc._id];
-            const pushData = {src: 'http://localhost:3500/uploads/' + sDoc.file, id: sDoc._id}
+            const pushData = {src: UPLOADS_URL+sDoc.file, id: sDoc._id}
 
             if(multiple){
                 selectedFiles = [...selectedFiles, pushData]
@@ -35,27 +36,27 @@
         console.log(file)
         
         if(collection.slug === 'media') {
-            selectedFiles.push({src: 'http://localhost:3500/uploads/' + file, id: file})
+            selectedFiles.push({src: UPLOADS_URL + file, id: file})
         } else {
-            selectedFiles.push({src: 'http://localhost:3500/uploads/' + file.file, id: file._id})
+            selectedFiles.push({src: UPLOADS_URL + file.file, id: file._id})
         }
 
     } else if(files && files?.length > 0){
-        files.forEach((file:any) => {
-            selectedFiles.push({src: 'http://localhost:3500/uploads/' + file.file, id: file._id})
+        files.forEach((file) => {
+            selectedFiles.push({src: UPLOADS_URL + file.file, id: file._id})
         });
     }
 
-    function handleChange(e:any) {
+    function handleChange(e) {
         const files = e.target.files;
         console.log(files);
 
         // Solo mantener una cola de archivos si la propiedad multiple es true
         if (multiple) {
             // Crear una nueva cola de archivos
-            const newSelectedFiles:any = [];
+            const newSelectedFiles = [];
 
-            Object.values(files).forEach((file:any) => {
+            Object.values(files).forEach((file) => {
                 const src = URL.createObjectURL(file);
                 const newFile = { src, file };
                 console.log(newFile);
@@ -73,17 +74,17 @@
             }
 
             // Actualizar el input de archivos para reflejar la cola completa
-            const input:any = document.getElementById(name);
+            const input = document.getElementById(name);
             if (input) {
                 const newFileList = new DataTransfer();
-                selectedFiles.forEach((file:any) => {
+                selectedFiles.forEach((file) => {
                     newFileList.items.add(file.file);
                 });
                 input.files = newFileList.files;
             }
         } else {
             // Si no es múltiple, simplemente asignar los nuevos archivos a selectedFiles
-            selectedFiles = Object.values(files).map((file:any) => ({
+            selectedFiles = Object.values(files).map((file) => ({
                 src: URL.createObjectURL(file),
                 file
             }));
@@ -91,7 +92,7 @@
     }
 
 
-    function removeFileHandle(index:any){
+    function removeFileHandle(index){
         const file = selectedFiles[index];
         console.log(file)
         if(file?.id){
@@ -104,17 +105,17 @@
             
         }
 
-        selectedFiles = selectedFiles.filter((_:any, i:any) => i !== index);
+        selectedFiles = selectedFiles.filter((_, i) => i !== index);
 
         // Crear un nuevo FileList con los archivos restantes
         const newFileList = new DataTransfer();
 
-        selectedFiles.forEach((file:any) => {
+        selectedFiles.forEach((file) => {
             newFileList.items.add(file.file);
         });
 
         // Actualizar el input de archivos con el nuevo FileList
-        const input:any = document.getElementById(name);
+        const input = document.getElementById(name);
         if (input) {
             input.files = newFileList.files;
         }
