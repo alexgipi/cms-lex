@@ -6,7 +6,7 @@
   import { Button, Modal } from 'flowbite-svelte';
   import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
   import { formatDate } from "../../utils";
-  import { API_URL } from '../consts.mjs';
+  import { API_URL, UPLOADS_URL } from '../consts.mjs';
   let modalOpened = false;
 
   export let collectionFields = [];
@@ -527,13 +527,13 @@
                                     <img
                                       class="bg-[#fff] rounded-lg w-[80px]"
                                       alt="Imágen"
-                                      src={'http://localhost:3500/uploads/thumbnail/' + document[key.name]}
+                                      src={UPLOADS_URL + 'thumbnail/' + document[key.name]}
                                     />                                    
                                   {:else}
                                     <img
                                       class="bg-[#fff] rounded-lg w-[80px]"
                                       alt="Imágen"
-                                      src={'http://localhost:3500/uploads/thumbnail/' + document[key.name]?.file}
+                                      src={UPLOADS_URL + 'thumbnail/' + document[key.name]?.file}
                                     />
                                   {/if}
                                 {/if}
@@ -546,13 +546,13 @@
                                     <img
                                       class="bg-[#111] max-h-[80px] object-cover rounded-lg w-[80px]"
                                       alt="Imágen"
-                                      src={'http://localhost:3500/uploads/thumbnail/' + document[key.name][0].file}
+                                      src={UPLOADS_URL + 'thumbnail/' + document[key.name][0].file}
                                     />
                                   {:else}
                                     <img
                                       class="bg-[#111] max-h-[80px] object-cover rounded-lg w-[80px]"
                                       alt="Imágen"
-                                      src={'http://localhost:3500/uploads/thumbnail/' + document[key.name][0]}
+                                      src={UPLOADS_URL + 'thumbnail/' + document[key.name][0]}
                                     />
                                   {/if}
 
