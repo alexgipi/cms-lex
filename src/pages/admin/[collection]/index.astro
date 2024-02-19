@@ -99,7 +99,7 @@ if(collection === 'settings'){
                   </div>                  
                 </div>
                 :
-                <TableList client:only identity={identity} collectionFields={collectionFields} collectionName={collectionName} collection={collection} documents={documents}></TableList>
+                <TableList client:only identity={identity} collectionFields={collectionFields} collectionName={collectionName} collection={collections[collection || '']} documents={documents}></TableList>
               }
 
             </section>   
