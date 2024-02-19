@@ -25,7 +25,7 @@
 
   if(identity?.token) token = identity.token;
 
-  const localStorageFields = localStorage.getItem(collection);
+  const localStorageFields = localStorage.getItem(collection.slug);
   
   if(localStorageFields){
     collectionFields = JSON.parse(localStorageFields);
@@ -35,14 +35,14 @@
     collectionFields = addField(collectionFields, {name:'createdAt', type: 'Date'});
     collectionFields = addField(collectionFields, {name:'updatedAt', type: 'Date'});
     
-    if(collection === 'users'){
+    if(collection.slug === 'users'){
       collectionFields = collectionFields.filter((colField) => {
         return colField.name != 'password'
       })
     }
     console.log(collectionFields)
     fieldsToRender = collectionFields;
-    localStorage.setItem(collection, JSON.stringify(collectionFields))
+    localStorage.setItem(collection.slug, JSON.stringify(collectionFields))
   }
 
   // $: stages = collectionFields;
@@ -72,7 +72,7 @@
       console.log(newCollectionFields);
       fieldsToRender = newCollectionFields;
       // collectionFields = fieldsToRender;
-      localStorage.setItem(collection, JSON.stringify(newCollectionFields));
+      localStorage.setItem(collection.slug, JSON.stringify(newCollectionFields));
     
   };
 
@@ -84,7 +84,7 @@
   const sortParam = urlParams.get("sort");
   const pageParam = urlParams.get("page");
 
-  if (collection === "settings") {
+  if (collection.slug === "settings") {
   } else {
     if (documents.length > 0) {
       if(!localStorageFields){
@@ -96,7 +96,7 @@
           }
         });
 
-        localStorage.setItem(collection, JSON.stringify(collectionFields))
+        localStorage.setItem(collection.slug, JSON.stringify(collectionFields))
       }
       
       // Define el número máximo de claves que deseas obtener
@@ -156,7 +156,7 @@
     collectionFields[indexColFields].active = true;
     fieldsToRender[index].active = true;
 
-    localStorage.setItem(collection, JSON.stringify(fieldsToRender))
+    localStorage.setItem(collection.slug, JSON.stringify(fieldsToRender))
   }
 
   function disableFieldHandle(e, field, i){
@@ -166,7 +166,7 @@
     collectionFields[indexColFields].active = false;
     fieldsToRender[index].active = false;
 
-    localStorage.setItem(collection, JSON.stringify(fieldsToRender))
+    localStorage.setItem(collection.slug, JSON.stringify(fieldsToRender))
   }
 
   let modalMultipleRemove = false
@@ -193,7 +193,7 @@
 
   async function removeDoc(docId){
     try {
-      const res = await fetch(API_URL + collection + '/' + docId, {
+      const res = await fetch(API_URL + collection.slug + '/' + docId, {
         method: "DELETE",
         headers: {
           Authorization: "Bearer " + token,
@@ -229,12 +229,12 @@
       <h1
         class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
       >
-        {collectionName}
+      {collection?.labels?.plural['es'] || collection.name}
       </h1>
 
-      {#if collection === 'media'}
+      {#if collection.slug === 'media'}
         <a
-          href={collection + "/create"}
+          href={collection.slug + "/create"}
           type="button"
           class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
         >
@@ -252,7 +252,7 @@
         </a>
       {:else}
         <a
-          href={collection + "/create"}
+          href={collection.slug + "/create"}
           type="button"
           class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
         >
@@ -282,7 +282,7 @@
                 name="email"
                 id="users-search"
                 class="bg-zinc-50 border border-zinc-300 text-zinc-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 px-4 dark:bg-[#000] dark:border-[#1f1f1f] dark:placeholder-[#898989] dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder={"Search for " + collectionName}
+                placeholder={"Buscar..."}
               />
             </div>
           </form>
@@ -358,8 +358,8 @@
 
 {#if (!documents || documents?.length === 0)}
   <div class="no-content-section container">
-    <p>No <strong>{collectionName}</strong> found. Either no <span class="capitalize">{collection?.replaceAll('-', ' ')}</span> exist yet or none match the filters you've specified above.</p>
-    <a class="btn" href={collection+'/create'}>Create new <span>{pluralize.singular(collectionName)}</span></a>
+    <p>No <strong>{collectionName}</strong> found. Either no <span class="capitalize">{collection.slug?.replaceAll('-', ' ')}</span> exist yet or none match the filters you've specified above.</p>
+    <a class="btn" href={collection.slug+'/create'}>Crear nuevo <span class="lowercase">{collection?.labels?.singular['es'] || collection.name}</span></a>
   </div>
 {/if}
 
@@ -610,7 +610,7 @@
                     >
                       <div class="flex items-center gap-2">
                         <a
-                          href={collection + "/" + document._id}
+                          href={collection.slug + "/" + document._id}
                           type="button"
                           class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-zinc-500 hover:text-zinc-300 transition-colors rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-[#131313] dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         >
