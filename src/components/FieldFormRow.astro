@@ -6,6 +6,7 @@ import UploadField from './UploadField.svelte';
 import BooleanField from './fields/BooleanField.astro';
 import InputField from './fields/InputField.astro';
 import SelectField from './fields/SelectField.astro';
+import ObjectField from './fields/ObjectField.svelte';
 
 const identityCookieValue = Astro.cookies.get("identity")?.value;
 let identity = null;
@@ -77,6 +78,10 @@ const { field, document, collection, fieldCheckedDocsIds }:any = Astro.props;
         <InputField name={field.name} id={field.name} type="text" value={document[field.name]}></InputField>
       )}
 
+      {field?.type === "date" && (
+      <InputField name={field.name} id={field.name} type="text" value={document[field.name]}></InputField>
+      )}
+
       {field?.type === "number" && (
         <InputField name={field.name} id={field.name} type="number" value={document[field.name]}></InputField>
       )}
@@ -98,6 +103,10 @@ const { field, document, collection, fieldCheckedDocsIds }:any = Astro.props;
 
       {field?.type === "boolean" &&
         <BooleanField name={field.name} currentValue={document[field.name]}></BooleanField>
+      }
+
+      { field?.type === "object" && 
+        <ObjectField objectValue={document[field.name]}/>
       }
 
       {field?.type === "relation" &&
