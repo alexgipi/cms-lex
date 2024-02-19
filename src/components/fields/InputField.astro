@@ -1,4 +1,6 @@
 ---
+import { formatDate } from '../../../utils';
+
 interface Props {
     name: string | null;
     id?: string | null;
@@ -11,9 +13,19 @@ const { name, id, value, placeholder } = Astro.props;
 const type:any= Astro.props.type;
 ---
 
-<input 
-type={type || 'text'} 
-id={id} 
-name={name} 
-value={value} 
-/>
+{ name === 'createdAt' || name === 'updatedAt' ?
+    <input 
+    type={type || 'text'} 
+    id={id} 
+    name={name} 
+    value={formatDate(value)}
+    readonly
+    />
+    :
+    <input 
+    type={type || 'text'} 
+    id={id} 
+    name={name} 
+    value={value} 
+    />
+}
