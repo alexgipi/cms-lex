@@ -13,12 +13,26 @@ export const CollectionsConfig = [
         return true
       },
     },
+    labels: {
+      singular: {
+        es: "Categoría de producto",
+        en: "Product category",
+      },
+      plural: {
+        es: "Categorías de producto",
+        en: "Product categories",
+      },
+    },
     fields: [
       {
         name: "name",
         type: "text",
         required: true,
         unique: true,
+        label: {
+          es: "Nombre",
+          en: "Name",
+        },
       },
       {
         name: "slug",
@@ -40,28 +54,50 @@ export const CollectionsConfig = [
         options: {
           sidebar: true,
         },
+        label: {
+          es: "Imágenes",
+          en: "Images",
+        },
       },
       {
         name: "description",
         type: "richText",
         default: null,
+        label: {
+          es: "Descripción",
+          en: "Description",
+        },
       },
       {
         name: "totalProducts",
         type: "number",
         default: 0,
       },
-    ],
+    ],    
   },
   {
     name: "Product attributes",
     access: {
       read: () => true,
     },
+    labels: {
+      singular: {
+        es: "Atributo de producto",
+        en: "Product attribute",
+      },
+      plural: {
+        es: "Atributos de producto",
+        en: "Product attributes",
+      },
+    },
     fields: [
       {
         name: "name",
         type: "text",
+        label: {
+          es: "Nombre",
+          en: "Name",
+        },
       },
       {
         name: "slug",
@@ -75,11 +111,16 @@ export const CollectionsConfig = [
         name: "options",
         type: "text",
         required: true,
+        label: {
+          es: "Opciones",
+          en: "Options",
+        },
       },
     ],
   },
   {
     name: "Orders",
+    useAsTitle: "orderNumber",
     access: {
       read: ({req: {user}}) => {
         if(user){
@@ -96,83 +137,182 @@ export const CollectionsConfig = [
       },
       create: () => true,
     },
+    labels: {
+      singular: {
+        es: "Pedido",
+        en: "Order",
+      },
+      plural: {
+        es: "Pedidos",
+        en: "Orders",
+      },
+    },
     fields: [
       {
-        name: "user",
-        type: "relation",
-        relationTo: "Users",
-        default: null,
-      },
-      {
-        name: "guestCustomerId",
-        type: "text",
-        default: null,
-      },
-      {
-        name: "orderNumber",
-        type: "text",
-        unique: true,
-        required: true,
-      },
-      {
-        name: "items",
-        type: "object",
-        required: true,
-      },
-      {
-        name: "email",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "customerName",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "shippingAddress",
-        type: "object",
-        required: true,
-      },
-      {
-        name: "billingAddress",
-        type: "object",
-        required: true,
-      },
-      {
-        name: "paymentMethod",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "subtotal",
-        type: "number",
-        required: true,
-      },
-      {
-        name: "total",
-        type: "number",
-        required: true,
-      },
-      {
-        name: "shippingCost",
-        type: "number",
-        required: true,
-      },
-      {
-        name: "shippingType",
-        type: "text",
-        required: true,
+        name: "createdAt",
+        type: "date",
+        label: {
+          es: "Fecha del pedido",
+          en: "Order date",
+        },
       },
       {
         name: "status",
         type: "select",
         enum: ["pending", "processing", "on-hold", "completed", "cancelled", "refunded", "failed", "checkout-draft"],
         default: "processing",
+        label: {
+          es: "Estado",
+          en: "Status",
+        },
         options: {
-          sidebar: true,
+          sidebar: true
         }
       },
+      {
+        name: "orderNumber",
+        type: "text",
+        unique: true,
+        required: true,
+        label: {
+          es: "Número del pedido",
+          en: "Order number",
+        },
+        options: {
+          sidebar: true
+        }
+      },
+      {
+        name: "customerName",
+        type: "text",
+        required: true,
+        label: {
+          es: "Nombre del cliente",
+          en: "Customer name",
+        },
+      },
+      {
+        name: "items",
+        type: "object",
+        required: true,
+        label: {
+          es: "Artículos del pedido",
+          en: "Order items",
+        },
+      },
+      {
+        name: "email",
+        type: "text",
+        required: true,
+        label: {
+          es: "Correo electrónico",
+          en: "Email",
+        },
+      },
+      {
+        name: "shippingAddress",
+        type: "object",
+        required: true,
+        label: {
+          es: "Dirección de envío",
+          en: "Shipping Address",
+        },
+      },
+      {
+        name: "billingAddress",
+        type: "object",
+        required: true,
+        label: {
+          es: "Dirección de facturación",
+          en: "Billing Address",
+        },
+      },
+      {
+        name: "total",
+        type: "number",
+        required: true,
+        label: {
+          es: "Total",
+          en: "Total",
+        },
+        options: {
+          sidebar: true
+        },
+      },
+      {
+        name: "subtotal",
+        type: "number",
+        required: true,
+        label: {
+          es: "Subtotal",
+          en: "Subtotal",
+        },
+        options: {
+          sidebar: true
+        },
+      },
+      {
+        name: "shippingCost",
+        type: "number",
+        required: true,
+        label: {
+          es: "Coste de envío",
+          en: "Shipping Cost",
+        },
+        options: {
+          sidebar: true
+        },
+      },
+      {
+        name: "shippingType",
+        type: "text",
+        required: true,
+        label: {
+          es: "Tipo de envío",
+          en: "Shipping Type",
+        },
+        options: {
+          sidebar: true
+        },
+      },
+      {
+        name: "paymentMethod",
+        type: "text",
+        required: true,
+        label: {
+          es: "Metodo de pago",
+          en: "Payment method",
+        },
+        options: {
+          sidebar: true
+        },
+      },
+      {
+        name: "user",
+        type: "relation",
+        relationTo: "Users",
+        default: null,
+        label: {
+          es: "Usuario",
+          en: "User",
+        },
+        options: {
+          sidebar: true
+        }
+      },
+      {
+        name: "guestCustomerId",
+        type: "text",
+        default: null,
+        options: {
+          sidebar: true
+        },
+        label: {
+          es: "Id. Usuario invitado",
+          en: "Guest Customer ID",
+        },
+      },
+
     ],
   },
   {
@@ -207,11 +347,25 @@ export const CollectionsConfig = [
       adminThumbnail: "thumbnail",
       mimeTypes: ["image/*"],
     },
+    labels: {
+      singular: {
+        es: "Medios",
+        en: "Media",
+      },
+      plural: {
+        es: "Medios",
+        en: "Media",
+      },
+    },
     fields: [
       {
         name: "file",
         type: "image",
         reqired: true,
+        label: {
+          es: "Archivo",
+          en: "File",
+        },
       },
       {
         name: "slug",
@@ -227,7 +381,11 @@ export const CollectionsConfig = [
         default: null,
         options: {
           sidebar: true
-        }
+        },
+        label: {
+          es: "Texto alternativo",
+          en: "Alt text",
+        },
       },
       {
         name: "legend",
@@ -235,12 +393,20 @@ export const CollectionsConfig = [
         default: null,
         options: {
           sidebar: true
-        }
+        },
+        label: {
+          es: "Leyenda",
+          en: "Legend",
+        },
       },
       {
         name: "description",
         type: "richText",
         default: null,
+        label: {
+          es: "Descripción",
+          en: "Description",
+        },
       },
     ],
   },
@@ -249,12 +415,26 @@ export const CollectionsConfig = [
     access: {
       read: () => true,
     },
+    labels: {
+      singular: {
+        es: "Menu",
+        en: "Menu",
+      },
+      plural: {
+        es: "Menus",
+        en: "Menus",
+      },
+    },
     fields: [
       {
         name: "name",
         type: "text",
         unique: true,
         reqired: true,
+        label: {
+          es: "Nombre",
+          en: "Name",
+        },
       },
       {
         name: "slug",
@@ -266,25 +446,13 @@ export const CollectionsConfig = [
         }
       },
       {
-        name: "alt",
-        type: "text",
-        default: null,
-        options: {
-          sidebar: true
-        }
-      },
-      {
-        name: "legend",
-        type: "text",
-        default: null,
-        options: {
-          sidebar: true
-        }
-      },
-      {
         name: "description",
         type: "richText",
         default: null,
+        label: {
+          es: "Descripción",
+          en: "Description",
+        },
       },
     ],
   },
@@ -293,11 +461,25 @@ export const CollectionsConfig = [
     access: {
       read: () => true,
     },
+    labels: {
+      singular: {
+        es: "Página",
+        en: "Page",
+      },
+      plural: {
+        es: "Páginas",
+        en: "Pages",
+      },
+    },
     fields: [
       {
         name: "name",
         type: "text",
         reqired: true,
+        label: {
+          es: "Nombre",
+          en: "Name",
+        },
       },
       {
         name: "slug",
@@ -312,6 +494,10 @@ export const CollectionsConfig = [
         name: "content",
         type: "richText",
         default: null,
+        label: {
+          es: "Contenido",
+          en: "Content",
+        },
       },
     ],
   },
