@@ -21,7 +21,7 @@ await Promise.all(Object.values(Collections).map(async (collection) => {
 ---
 
 <div class="container">
-    <h1>Welcome to <span class="text-gradient">{DashboardConfig.title}</span></h1>
+    <h1>El Mundo del Saquito</h1>
     <p class="instructions">
       To get started, open the directory <code>src/pages</code> in your
       project.<br />
@@ -43,11 +43,29 @@ await Promise.all(Object.values(Collections).map(async (collection) => {
 
     <section class="dashboard-blocks">
       <div class="dashboard-block">
+        <div class="w-full rounded-lg p-4 md:p-6">
+          <div class="flex justify-between mb-5">
+            <div>
+              <h5 class="leading-none text-3xl font-bold text-zinc-900 dark:text-white mb-3">Sitio web</h5>
+              <p class="text-base font-normal text-zinc-500 dark:text-zinc-400">
+                <a href="https://elmundodelsaquito.es">https://elmundodelsaquito.es</a>
+              </p>
+            </div>
+          </div>
+
+          <iframe style="width: 100%;min-height: 900px;border-radius: 9px;" src="http://localhost:4321"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-blocks">
+      <div class="dashboard-block">
           <Chart id="chart-1"></Chart>
       </div>
       <div class="dashboard-block">
           <Chart id="chart-2"></Chart>
       </div>
+      
 <!-- 
       <div class="dashboard-block">
           <header>
@@ -76,12 +94,17 @@ await Promise.all(Object.values(Collections).map(async (collection) => {
 	  font-size: 3.6rem;
     font-weight: 700;
     line-height: 1.4;
-    margin: 1em 0;
+    margin: 2.5rem 0;
     text-wrap: balance;
     max-width: 90%;
     display: flex;
     flex-wrap: wrap;
     gap: 0 16px;
+  }
+
+  iframe {
+    background-color: #121212 !important;
+    color-scheme: darkness;
   }
   
   .text-gradient {
