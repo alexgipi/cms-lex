@@ -183,7 +183,7 @@
   </div>
 
   <svelte:fragment slot="footer">
-    <div class="flex w-full justify-between">
+    <div class="flex w-full justify-between items-center">
       <div>
         {#if multiple}
           <div class="multiple-field-info" style="display: flex;align-items: center;gap: 8px;font-size: 0.9em;color: #8f8f8f;">
