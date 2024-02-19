@@ -164,18 +164,18 @@
 <style>
     /* Preview files */
   .preview-files {
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      cursor: default;
+    padding: 12px;
+    display: grid;
+    flex-direction: column;
+    gap: 8px;
+    cursor: default;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
 
   .preview-file {
     position: relative;
     border-radius: 8px;
     overflow: hidden;
-    padding: 8px;
     background-color: #4b4b4b2e;
   }
 

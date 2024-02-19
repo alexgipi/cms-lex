@@ -40,7 +40,7 @@ export function formatDate(dateString) { // date: '2023-12-11T05:22:32.977Z'
       day: 'numeric',
       hour: 'numeric',
       minute: 'numeric',
-      timeZone: 'UTC', // Ajusta esto según tu zona horaria
+      timeZone: 'Europe/Madrid', // Ajusta esto según tu zona horaria
     });
   
     return dateFormat.format(date);

@@ -6,12 +6,12 @@ export const Products = {
     },
     labels: {
       singular: {
-        en: "Product",
         es: "Producto",
+        en: "Product",
       },
       plural: {
-        en: "Products",
         es: "Productos",
+        en: "Products",
       },
     },
     fields: [

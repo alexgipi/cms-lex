@@ -7,11 +7,11 @@ import { lexiConfig } from "./lexgi.config.mjs";
 import userExtractor from "./middleware/userExtractor.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import isAdmin from "./middleware/isAdmin.js";
 import { DEFAULT_LEXI_SETTINGS } from "./consts.js";
 import fs from "fs";
 import sharp from "sharp";
 import { API_URL } from "./consts.js";
+import { sendEmail } from "./email-service.js";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -69,6 +69,9 @@ const fieldTypeTypes = {
     boolean: {
       type: Boolean,
     },
+    date: {
+      type: Date
+    }
 };
 
 export let Collections = {
@@ -315,6 +318,122 @@ export function createCollectionEndpoints(collection, router) {
           });
         }
       });
+
+      router.post(`/${collection.slug}/forgot-password`, upload.fields([]), async (req, res) => {
+        const { email } = req.body;
+
+        if (!email)
+          return res.status(400).send({ ok: false, error: "Missing email" });
+
+        const user = await Model.findOne({
+          $or: [
+            { email },
+            { username: email}
+          ]
+        });
+
+        if (!user) {
+          return res.status(401).send({
+            ok: false,
+            error: "Invalid user",
+          });
+        }
+
+        const userForToken = {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+        };
+
+        const token = await jwt.sign(userForToken, process.env.SECRET, {
+          expiresIn: 20 * 60, // 20 minutos en segundos
+        });
+
+        const resetPasswordURL = `http://localhost:4321/reset-password/complete?token=${token}`
+
+        const emailOptions = {
+          fromName: "🌍 Elmundo del saquito", // sender address
+          fromEmail: "no-reply@elmundodelsaquito.es",
+          to: "alexgp895@gmail.com",
+          subject: "Reset password",
+          html: `
+            <html>
+              <body>
+                <h1>Restablecer contraseña</h1>
+                <p>
+                  Para restablecer tu contraseña de El mundo del saquito, haz clic en el siguiente enlace:
+                </p>
+                <p>
+                  <a href="${resetPasswordURL}">Restablecer contraseña</a>    
+                </p>
+                <p>
+                  Este enlace sólo será valido durante los próximos 20 minutos.<br>
+                  Si no solicitaste restablecer tu contraseña, borra este mensaje.                  
+                </p>
+              </body>
+            </html>
+          `
+        }
+
+        sendEmail(emailOptions)
+
+        if (token) {
+          res.send({
+            ok: true,
+            message: "Reset password link sended.",
+            user: userForToken,
+          });
+        }
+      });
+
+      router.post(`/${collection.slug}/reset-password`, [upload.fields([]), userExtractor], async (req, res) => {
+        const { password } = req.body;
+        const user = req.user;
+
+        if (!password) {
+          return res.status(400).send({ ok: false, error: "Missing password" });
+        }
+
+        if(user){
+          const saltRounds = 10;
+          const salt = await bcrypt.genSalt(saltRounds);
+          const hash = await bcrypt.hash(password, salt);
+
+          console.log(hash)
+
+          const updatedUser = await Model.findByIdAndUpdate(
+            user.id, 
+            { password: hash },
+            { new: true }
+          ).select('-password');
+
+          if(!updatedUser){
+            return res.status(400).send({ ok: false, error: "Error updating password" });
+          }
+
+          const userForToken = {
+            id: updatedUser._id,
+            name: updatedUser?.name || null,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            role: updatedUser?.role || null,
+            address: updatedUser?.address || null,
+          };
+  
+          const token = await jwt.sign(userForToken, process.env.SECRET, {
+            expiresIn: 60 * 60 * 24 * 7,
+          });
+
+          res.status(200).send({
+            ok: true, user: updatedUser, token
+          })
+          
+          
+        }
+
+
+      });
+
     }
 
     const afterHook = (req, res, next) => {
@@ -501,7 +620,7 @@ export function createCollectionEndpoints(collection, router) {
       const {page, limit} = req.query;
       const skip = ((page || 1) - 1) * (limit || 10);
     
-      const documents = await Model.find(req.findQuery || {}).select("-password");
+      const documents = await Model.find(req.findQuery || {}).sort('-createdAt').select("-password");
     
       res.send(documents)
     });
@@ -728,15 +847,20 @@ export function createCollectionEndpoints(collection, router) {
             let find = {};
             find[propName] = document._id;
             const documents = await Model.find(find).limit(limit);
-          
             res.send(documents)
+          } else {
+            res.send([])
           }
         }else {
           let find = {};
           find[propName] = value;
           const documents = await Model.find(find).limit(limit);
-        
-          res.send(documents)
+          console.log({documents})
+          if(documents){
+            res.send(documents)
+          }else {
+            res.status(401).send({message: "No hay documentos con estos criterios"})
+          }
         }
 
         

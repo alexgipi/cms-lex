@@ -30,7 +30,7 @@ const customCss = `
     />
 
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-	
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism-dark.min.css" integrity="sha512-y6rcKLYkttB9ZUBaz0IsncWFo1VoqISrcMY6J1i6Nb9WB9jRrpll8zjt5e1/naZHyXFoR/1VlH72+2VJ1Uzh7A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <!-- <ViewTransitions fallback='swap'></ViewTransitions> -->
@@ -91,8 +91,8 @@ const customCss = `
     width: 100%;
     max-width: 1820px;
     margin: 0 auto;
-    padding-left: 3rem;
-    padding-right: 3rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
   }
 
   .padding-0 {
@@ -213,17 +213,6 @@ const customCss = `
     display: none;
   }
 
-    /* Preview files */
-    .preview-files {
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-  }
-
-  .preview-file-img {
-      border-radius: 8px;
-  }
 
   /* form-row and form-field */
   .form-row {
@@ -250,6 +239,16 @@ const customCss = `
     outline: 1px solid #eeeeee14;
     font-size: 0.9em;
     max-width: 100%;
+    line-height: 1.5;
+  }
+
+  .form-field input:read-only {
+    cursor: default;
+
+    &:focus {
+      box-shadow: none;
+      outline-offset: 0;
+    }
   }
 
   .form-field textarea {

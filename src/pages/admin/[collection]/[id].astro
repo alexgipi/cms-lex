@@ -252,7 +252,7 @@ if (Astro.request.method === "POST") {
             </div>
           </header>
 
-          <div class="document-form flex-auto">
+          <div class="container document-form flex-auto">
             <div class="document-form__main flex flex-col gap-6">
               {
                 mainFields.map((field:any) => (
@@ -474,13 +474,19 @@ if (Astro.request.method === "POST") {
   .document-form__aside,
   .document-form__main {
     flex: auto;
-    padding: 3rem;
+    padding: 3rem 4rem;
+  }
+
+
+  .document-form__main {
+    padding-left: 0;
   }
 
   .document-form__aside {
     max-width: 490px;
     border-left: 1px solid rgb(255 255 255 / 7%);
     width: 100%;
+    padding-right: 0;
   }
 
   .rich-text-editor {

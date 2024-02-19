@@ -12,10 +12,10 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendEmail(mailOptions) {
-  const {from, to, subject, html} = mailOptions;
+  const {fromName, fromEmail, to, subject, html} = mailOptions;
 
   const info = await transporter.sendMail({
-    from,
+    from: `"${fromName}" <${fromEmail}>`, // sender address
     to,
     subject,
     html,
@@ -35,7 +35,8 @@ export async function sendEmail(mailOptions) {
 export async function sendOrderEmail(order, options){
   const {fromName, fromEmail, to, subject, html} = options;
     const mailOptions = {
-        from: `"${fromName}" <${fromEmail}>`, // sender address
+        fromName,
+        fromEmail, // sender address
         to, // list of receivers
         subject: subject || "✅ Compra realizada correctamente", // Subject line // plain text body
         html: html || newOrderClientEmailTemplate(order)

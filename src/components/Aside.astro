@@ -84,7 +84,9 @@ async function getCollectionDoc(){
           { 
             Object.values(settings).map((setting:any) => (
               <li class="flex flex-col">
-                <a href={'/admin/settings/'+setting.slug}>{setting?.name}</a>
+                <a href={'/admin/settings/'+setting.slug}>
+                  {setting?.name}
+                </a>
               </li>
             ))
           }
@@ -108,7 +110,7 @@ async function getCollectionDoc(){
               }
               href={"/admin/" + collection.slug}
             >
-              {collection.name}
+              {collection?.labels?.plural['es'] || collection.name}
             </a>
           ))
         }
@@ -166,11 +168,12 @@ async function getCollectionDoc(){
   }
 
   .nav {
-    padding: 16px;
+    padding: 22px;
     flex: auto;
     display: flex;
     flex-direction: column;
     gap: 22px;
+    overflow: auto;
   }
 
   .nav-block {

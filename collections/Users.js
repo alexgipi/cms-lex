@@ -5,6 +5,16 @@ export const Users = {
     access: {
       read: () => true,
     },
+    labels: {
+      singular: {
+        es: "Usuario",
+        en: "User",
+      },
+      plural: {
+        es: "Usuarios",
+        en: "Users",
+      },
+    },
     fields: [
       {
         name: "role",
