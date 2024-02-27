@@ -208,7 +208,7 @@ if (Astro.request.method === "POST") {
           <header
             class="page-header sticky top-0 z-30 py-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
           >
-            <div class="container w-full flex justify-between items-center">
+            <div class="flexee-container w-full flex justify-between items-center">
               <div class="flex gap-4">
                 <h1
                   class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
@@ -234,7 +234,7 @@ if (Astro.request.method === "POST") {
             </div>
           </header>
 
-          <div class="container document-form flex-auto">
+          <div class="flexee-container document-form flex-auto">
             <div class="document-form__main flex flex-col gap-6">
               {
                 mainFields.map((field) => (
@@ -280,10 +280,6 @@ if (Astro.request.method === "POST") {
 <style>
   h1 {
     margin: 0;
-  }
-
-  .page-header {
-    border-bottom: 1px solid rgb(255 255 255 / 7%);
   }
 
   .no-content-section {
