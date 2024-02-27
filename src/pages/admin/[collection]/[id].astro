@@ -152,7 +152,7 @@ if (Astro.request.method === "POST") {
     // Crear un nuevo objeto FormData
     // Crear un nuevo objeto FormData
     let newFormData = new FormData();
-
+    let menuItems = {};
     // Añadir solo los campos que no están vacíos al nuevo objeto FormData
     for (let [key, value] of formData.entries()) {
       if(typeof value === 'object' && value?.size === 0 && value.name === 'undefined') {
@@ -160,7 +160,22 @@ if (Astro.request.method === "POST") {
       } else {
         if(value != document[key] && value != ''){
           console.log("Este es distinto: " + value)
-          newFormData.append(key, value);
+
+          console.log({key, value})
+
+          let splitedKey = key.split('.');
+
+          if(splitedKey.length > 1){
+            
+            assignValue(menuItems, key, value);
+            console.log(key + ' es array')
+            console.log(menuItems)
+            newFormData.append(key, value);
+          } else {
+            newFormData.append(key, value);
+          }
+
+          
         }
       }
     }
@@ -174,6 +189,28 @@ if (Astro.request.method === "POST") {
       console.error(error.message);
     }
   }
+}
+
+function assignValue(obj:any, path:any, value:any) {
+    let parts = path.split('.');
+    let current = obj;
+    for (let i = 0; i < parts.length; i++) {
+        let part = parts[i];
+        if (i === parts.length - 1) {
+            // Si la propiedad ya existe y es un objeto, anida la nueva propiedad dentro de ese objeto
+            if (current[part] && typeof current[part] === 'object') {
+                current[part] = Object.assign(current[part], value);
+            } else {
+                current[part] = value;
+            }
+        } else {
+            if (!current[part]) {
+                // Si el índice es numérico, crea un array, de lo contrario crea un objeto
+                current[part] = isNaN(parseInt(parts[i + 1])) ? {} : [];
+            }
+            current = current[part];
+        }
+    }
 }
 ---
 
@@ -206,7 +243,7 @@ if (Astro.request.method === "POST") {
           <header
             class="page-header sticky top-0 z-30 py-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
           >
-            <div class="container w-full flex justify-between items-center">
+            <div class="flexee-container w-full flex justify-between items-center">
               <div class="flex gap-4">
                 <h1
                   class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
@@ -252,7 +289,7 @@ if (Astro.request.method === "POST") {
             </div>
           </header>
 
-          <div class="container document-form flex-auto">
+          <div class="flexee-container document-form flex-auto">
             <div class="document-form__main flex flex-col gap-6">
               {
                 mainFields.map((field:any) => (
@@ -439,7 +476,7 @@ if (Astro.request.method === "POST") {
   }
 
   .page-header {
-    border-bottom: 1px solid rgb(255 255 255 / 7%);
+    border-bottom: 1px solid rgb(255 255 255 / 7%) !important;
   }
 
   .no-content-section {
