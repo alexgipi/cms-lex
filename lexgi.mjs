@@ -71,6 +71,9 @@ const fieldTypeTypes = {
     },
     date: {
       type: Date
+    },
+    row: {
+      type: Array
     }
 };
 
@@ -182,6 +185,88 @@ export function getCollection(collectionSlug) {
   return Collections[collectionSlug];
 }
 
+function generateSchema(fields, newSchema = {}, uploadFields = []){
+
+  fields.forEach((field) => {
+        
+    if(field.type === 'relation'){         
+      const relationToSlug = slugify(field.relationTo);
+      newSchema[field.name] = {
+        type: fieldTypeTypes[field.type].type,
+        ref: relationToSlug,
+        autopopulate: true,
+      };
+
+      if(field.hasMany){
+        newSchema[field.name] = [newSchema[field.name]]
+      }        
+
+    } else if (field.type === 'row') {
+      console.log(field.fields)
+      let data = generateSchema(field.fields);
+      newSchema = data["newSchema"];
+      uploadFields = data["uploadFields"];
+
+    } else {
+
+      if (field.type === 'images' || field.type === 'image'){
+        const relationToSlug = slugify(field.relationTo);
+       
+        if(relationToSlug != 'undefined'){
+          // console.log(relationToSlug, field.name)
+          newSchema[field.name] = {
+            type: Schema.ObjectId,
+            ref: relationToSlug,
+            autopopulate: true,
+          };
+
+          if(field.hasMany){
+            newSchema[field.name] = [newSchema[field.name]]
+          }
+        } else {
+          newSchema[field.name] = {
+            type: fieldTypeTypes[field.type].type,
+          };
+        }
+      } else {
+        newSchema[field.name] = {
+          type: fieldTypeTypes[field.type].type,
+        };
+      }          
+
+    }
+
+    if (field.required) {
+      newSchema[field.name].required = field.required;
+    }
+
+    if (field.unique) {
+      newSchema[field.name].unique = field.unique;
+    }
+
+    if (field.default === null) {
+      newSchema[field.name].default = null;
+    } else {
+      if (field.default != undefined)
+        newSchema[field.name].default = field.default;
+    }
+
+    // Upload fields
+    if(field.type === 'image'){
+      uploadFields.push({name: field.name, maxCount: 1})
+    }
+
+    if(field.type === 'images'){
+      uploadFields.push({name: field.name, maxCount: field?.max || 10})
+    }
+  });
+
+  return {
+    newSchema,
+    uploadFields
+  };
+}
+
 export function createCollectionEndpoints(collection, router) {
     const { fields } = collection;
     let newSchema = {};
@@ -199,73 +284,76 @@ export function createCollectionEndpoints(collection, router) {
     } = collectionAccessMiddlewares;
   
     if (fields) {
-      fields.forEach((field) => {
+      let data = generateSchema(fields);
+      newSchema = data["newSchema"];
+      uploadFields = data["uploadFields"];
+      // fields.forEach((field) => {
         
-        if(field.type === 'relation'){         
-          const relationToSlug = slugify(field.relationTo);
-          newSchema[field.name] = {
-            type: fieldTypeTypes[field.type].type,
-            ref: relationToSlug,
-            autopopulate: true,
-          };
+      //   if(field.type === 'relation'){         
+      //     const relationToSlug = slugify(field.relationTo);
+      //     newSchema[field.name] = {
+      //       type: fieldTypeTypes[field.type].type,
+      //       ref: relationToSlug,
+      //       autopopulate: true,
+      //     };
   
-          if(field.hasMany){
-            newSchema[field.name] = [newSchema[field.name]]
-          }        
+      //     if(field.hasMany){
+      //       newSchema[field.name] = [newSchema[field.name]]
+      //     }        
   
-        } else {
+      //   } else {
 
-          if (field.type === 'images' || field.type === 'image'){
-            const relationToSlug = slugify(field.relationTo);
+      //     if (field.type === 'images' || field.type === 'image'){
+      //       const relationToSlug = slugify(field.relationTo);
            
-            if(relationToSlug != 'undefined'){
-              // console.log(relationToSlug, field.name)
-              newSchema[field.name] = {
-                type: Schema.ObjectId,
-                ref: relationToSlug,
-                autopopulate: true,
-              };
+      //       if(relationToSlug != 'undefined'){
+      //         // console.log(relationToSlug, field.name)
+      //         newSchema[field.name] = {
+      //           type: Schema.ObjectId,
+      //           ref: relationToSlug,
+      //           autopopulate: true,
+      //         };
 
-              if(field.hasMany){
-                newSchema[field.name] = [newSchema[field.name]]
-              }
-            } else {
-              newSchema[field.name] = {
-                type: fieldTypeTypes[field.type].type,
-              };
-            }
-          } else {
-            newSchema[field.name] = {
-              type: fieldTypeTypes[field.type].type,
-            };
-          }          
+      //         if(field.hasMany){
+      //           newSchema[field.name] = [newSchema[field.name]]
+      //         }
+      //       } else {
+      //         newSchema[field.name] = {
+      //           type: fieldTypeTypes[field.type].type,
+      //         };
+      //       }
+      //     } else {
+      //       newSchema[field.name] = {
+      //         type: fieldTypeTypes[field.type].type,
+      //       };
+      //     }          
   
-        }
+      //   }
   
-        if (field.required) {
-          newSchema[field.name].required = field.required;
-        }
+      //   if (field.required) {
+      //     newSchema[field.name].required = field.required;
+      //   }
   
-        if (field.unique) {
-          newSchema[field.name].unique = field.unique;
-        }
+      //   if (field.unique) {
+      //     newSchema[field.name].unique = field.unique;
+      //   }
   
-        if (field.default === null) {
-          newSchema[field.name].default = null;
-        } else {
-          if (field.default != undefined)
-            newSchema[field.name].default = field.default;
-        }
+      //   if (field.default === null) {
+      //     newSchema[field.name].default = null;
+      //   } else {
+      //     if (field.default != undefined)
+      //       newSchema[field.name].default = field.default;
+      //   }
   
-        // Upload fields
-        if(field.type === 'image'){
-          uploadFields.push({name: field.name, maxCount: 1})
-        }
+      //   // Upload fields
+      //   if(field.type === 'image'){
+      //     uploadFields.push({name: field.name, maxCount: 1})
+      //   }
   
-        if(field.type === 'images'){
-          uploadFields.push({name: field.name, maxCount: field?.max || 10})
-        }
-      });
+      //   if(field.type === 'images'){
+      //     uploadFields.push({name: field.name, maxCount: field?.max || 10})
+      //   }
+      // });
     }
   
     const schema = new Schema(newSchema, { timestamps: true });

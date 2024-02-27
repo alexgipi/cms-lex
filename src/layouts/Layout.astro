@@ -87,7 +87,7 @@ const customCss = `
       monospace;
   }
 
-  .container {
+  .flexee-container {
     width: 100%;
     max-width: 1820px;
     margin: 0 auto;
@@ -111,7 +111,7 @@ const customCss = `
     text-transform: capitalize;
   }
   .layout {
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: var(--nav-width) 1fr;
     display: grid;
     align-items: flex-start;
     width: calc(100% + var(--nav-width));
@@ -199,9 +199,9 @@ const customCss = `
 	  }
     }
 
-	& .container {
-		align-items: center;
-	}
+    & .flexee-container {
+      align-items: center;
+    }
   }
 
   .section-header-actions {
