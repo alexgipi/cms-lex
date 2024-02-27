@@ -1,8 +1,6 @@
 <script>
-  import pluralize from 'pluralize';
   import Sortable from "https://unpkg.com/sortablejs?module";
   import { onMount } from "svelte";
-
   import { Button, Modal } from 'flowbite-svelte';
   import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
   import { formatDate } from "../../utils";
@@ -224,7 +222,7 @@
 <header
   class="page-header sticky top-0 z-30 py-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
 >
-  <div class="container w-full flex gap-6 justify-between items-center">
+  <div class="flexee-container w-full flex gap-6 justify-between items-center">
     <div class="flex gap-4">
       <h1
         class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
@@ -357,7 +355,7 @@
 </header>
 
 {#if (!documents || documents?.length === 0)}
-  <div class="no-content-section container">
+  <div class="no-content-section flexee-container">
     <p>No <strong>{collectionName}</strong> found. Either no <span class="capitalize">{collection.slug?.replaceAll('-', ' ')}</span> exist yet or none match the filters you've specified above.</p>
     <a class="btn" href={collection.slug+'/create'}>Crear nuevo <span class="lowercase">{collection?.labels?.singular['es'] || collection.name}</span></a>
   </div>
@@ -366,7 +364,7 @@
 {#if documents?.length > 0 }
   <div id="main-content" class="flex flex-col flex-auto">
     <div
-    class="container py-7 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+    class="flexee-container py-7 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
     >
       <div class="w-full">
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
@@ -435,7 +433,7 @@
     </div>
 
     <div class="overflow-hidden shadow flex-auto flex flex-col">
-      <div class="container flex flex-col flex-auto">
+      <div class="flexee-container flex flex-col flex-auto">
         <div class="overflow-x-auto">
           <div class="inline-block min-w-full align-middle">
             
@@ -675,7 +673,7 @@
     </div>
 
     <!-- <nav-pagination
-        class="container block sticky bottom-0 right-0 items-center w-full p-5 bg-white border-t border-zinc-200 sm:flex sm:justify-between dark:bg-[#000] dark:border-[#111]"
+        class="flexee-container block sticky bottom-0 right-0 items-center w-full p-5 bg-white border-t border-zinc-200 sm:flex sm:justify-between dark:bg-[#000] dark:border-[#111]"
       >
         <div class="flex items-center mb-4 sm:mb-0">
           <a
@@ -792,7 +790,6 @@ backdropClass='fixed inset-0 z-40 bg-zinc-900 bg-opacity-50 backdrop-blur-sm dar
   }
 
   .page-header {
-    border-bottom: 1px solid rgb(255 255 255 / 7%);
     height: 90px;
   }
 
