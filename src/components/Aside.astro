@@ -71,20 +71,25 @@ async function getCollectionDoc(){
           Dashboard
         </a>
         <div
-          class={currentPath === `admin/settings` ? "active nav-block-item" : "nav-block-item"}
+          class={currentPath.includes(`admin/settings`) ? "active nav-block-item" : "nav-block-item"}
           aria-controls="dropdown-example" data-collapse-toggle="dropdown-example"
+          aria-expanded={currentPath.includes(`admin/settings`)}
         >
-          Settings
+          Ajustes
           <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"></path>
           </svg>
         </div>
 
-        <ul id="dropdown-example" class="aside-submenu hidden py-2 space-y-2">
+        <ul id="dropdown-example" class={currentPath.includes(`admin/settings`) ? "aside-submenu py-2 space-y-2" : "aside-submenu hidden py-2 space-y-2"}>
           { 
             Object.values(settings).map((setting:any) => (
               <li class="flex flex-col">
-                <a href={'/admin/settings/'+setting.slug}>
+                <a class={
+                  currentPath === `admin/settings/${setting.slug}`
+                  ? "active"
+                  : ""
+                } href={'/admin/settings/'+setting.slug}>
                   {setting?.name}
                 </a>
               </li>
@@ -222,5 +227,9 @@ async function getCollectionDoc(){
 
   .aside-submenu li a {
     padding: 4px 10px;
+  }
+
+  .aside-submenu li a.active {
+    color: #924beb;
   }
 </style>
