@@ -1,0 +1,20 @@
+---
+import FieldFormRow from './FieldFormRow.astro';
+
+const currentLang = 'es';
+
+interface Props {
+  collection:any,
+  field:any,
+  parentField:any,
+  document?: any,
+  fieldCheckedDocsIds?:any,
+  itemIndex?:any,
+  parentName?:any,
+  stage?:any
+}
+
+const {collection, field, parentField, document, fieldCheckedDocsIds, itemIndex, parentName, stage }:any = Astro.props;
+
+---
+<FieldFormRow parentField={parentField} parentName={parentName} collection={collection} field={field} itemIndex={itemIndex}, document={stage}></FieldFormRow>
