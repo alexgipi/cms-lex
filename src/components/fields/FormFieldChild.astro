@@ -1,0 +1,26 @@
+---
+import FormField from "./FormField.astro"
+
+interface Props {
+    identity:any,
+    token:any,
+    collection:any,
+    field:any,
+    parentField?: any,
+    document?: any,
+    fieldCheckedDocsIds?:any
+}
+
+const {identity, token, field, parentField, document, collection, fieldCheckedDocsIds }:any = Astro.props;
+
+---
+
+<FormField
+  identity={identity}
+  token={token}
+  field={field}
+  parentField={parentField}
+  document={document}
+  collection={collection}
+  fieldCheckedDocsIds={fieldCheckedDocsIds}
+  ></FormField>
