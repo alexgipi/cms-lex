@@ -152,7 +152,7 @@ if (Astro.request.method === "POST") {
     // Crear un nuevo objeto FormData
     // Crear un nuevo objeto FormData
     let newFormData = new FormData();
-    let menuItems = {};
+    let menuItems:any = {};
     // Añadir solo los campos que no están vacíos al nuevo objeto FormData
     for (let [key, value] of formData.entries()) {
       if(typeof value === 'object' && value?.size === 0 && value.name === 'undefined') {
@@ -168,9 +168,6 @@ if (Astro.request.method === "POST") {
           if(splitedKey.length > 1){
             
             assignValue(menuItems, key, value);
-            console.log(key + ' es array')
-            console.log(menuItems)
-            newFormData.append(key, value);
           } else {
             newFormData.append(key, value);
           }
@@ -178,6 +175,14 @@ if (Astro.request.method === "POST") {
           
         }
       }
+    }
+
+    if(menuItems?.menu_items?.length > 0){
+      menuItems.menu_items.forEach((item:any, index:any) => {
+        Object.keys(item).forEach(key => {
+          newFormData.append(`menu_items[${index}][${key}]`, item[key]);
+        });
+      });
     }
 
     // Llamar a la función createDoc con el newFormData

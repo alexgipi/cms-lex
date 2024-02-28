@@ -17,7 +17,7 @@ import Stripe from "stripe";
 import errorHandlerMiddleware from "./middleware/handleErrors.js";
 
 // This is your test secret API key.
-const stripe = new Stripe("sk_test_Xgwk5Iu84Jw1Af7SRIzRU5ur");
+const stripe = new Stripe(process.env.STRIPE_SK);
 
 const app = express();
 app.use(cors());

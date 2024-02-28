@@ -271,7 +271,6 @@ export function createCollectionEndpoints(collection, router) {
     const { fields } = collection;
     let newSchema = {};
     let uploadFields = [];
-    const cpUpload = upload.fields(uploadFields)
 
     // Access middlewares
     const collectionAccessMiddlewares = getCollectionAccessMiddleares(collection.access);
@@ -287,74 +286,9 @@ export function createCollectionEndpoints(collection, router) {
       let data = generateSchema(fields);
       newSchema = data["newSchema"];
       uploadFields = data["uploadFields"];
-      // fields.forEach((field) => {
-        
-      //   if(field.type === 'relation'){         
-      //     const relationToSlug = slugify(field.relationTo);
-      //     newSchema[field.name] = {
-      //       type: fieldTypeTypes[field.type].type,
-      //       ref: relationToSlug,
-      //       autopopulate: true,
-      //     };
-  
-      //     if(field.hasMany){
-      //       newSchema[field.name] = [newSchema[field.name]]
-      //     }        
-  
-      //   } else {
-
-      //     if (field.type === 'images' || field.type === 'image'){
-      //       const relationToSlug = slugify(field.relationTo);
-           
-      //       if(relationToSlug != 'undefined'){
-      //         // console.log(relationToSlug, field.name)
-      //         newSchema[field.name] = {
-      //           type: Schema.ObjectId,
-      //           ref: relationToSlug,
-      //           autopopulate: true,
-      //         };
-
-      //         if(field.hasMany){
-      //           newSchema[field.name] = [newSchema[field.name]]
-      //         }
-      //       } else {
-      //         newSchema[field.name] = {
-      //           type: fieldTypeTypes[field.type].type,
-      //         };
-      //       }
-      //     } else {
-      //       newSchema[field.name] = {
-      //         type: fieldTypeTypes[field.type].type,
-      //       };
-      //     }          
-  
-      //   }
-  
-      //   if (field.required) {
-      //     newSchema[field.name].required = field.required;
-      //   }
-  
-      //   if (field.unique) {
-      //     newSchema[field.name].unique = field.unique;
-      //   }
-  
-      //   if (field.default === null) {
-      //     newSchema[field.name].default = null;
-      //   } else {
-      //     if (field.default != undefined)
-      //       newSchema[field.name].default = field.default;
-      //   }
-  
-      //   // Upload fields
-      //   if(field.type === 'image'){
-      //     uploadFields.push({name: field.name, maxCount: 1})
-      //   }
-  
-      //   if(field.type === 'images'){
-      //     uploadFields.push({name: field.name, maxCount: field?.max || 10})
-      //   }
-      // });
     }
+
+    const cpUpload = upload.fields(uploadFields)
   
     const schema = new Schema(newSchema, { timestamps: true });
     schema.plugin(autopopulate);
@@ -979,7 +913,6 @@ export async function createSettingEndpoints(collection, router) {
   const { fields } = collection;
   let newSchema = {};
   let uploadFields = [];
-  const cpUpload = upload.fields(uploadFields)
 
   if (fields) {
     fields.forEach((field) => {
@@ -1056,6 +989,8 @@ export async function createSettingEndpoints(collection, router) {
       }
     });
   }
+
+  const cpUpload = upload.fields(uploadFields)
 
   const schema = new mongoose.Schema(newSchema, options);
   schema.plugin(autopopulate);
