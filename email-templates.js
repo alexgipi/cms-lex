@@ -1,4 +1,4 @@
-import { siteUrl } from "./consts.js";
+import { SITE_URL } from "./consts.js";
 import { formatCurrency } from "./utils.js";
 
 export function newOrderClientEmailTemplate(order){
@@ -534,7 +534,7 @@ export function newOrderClientEmailTemplate(order){
                                                                         <h2
                                                                             style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:26px;font-style:normal;font-weight:bold;line-height:31px;color:#333333">
                                                                             Número de pedido:
-                                                                            <a target="_blank" href="${siteUrl+'/mi-cuenta/pedidos/'+ order.orderNumber}"
+                                                                            <a target="_blank" href="${SITE_URL+'/mi-cuenta/pedidos/'+ order.orderNumber}"
                                                                                 style="mso-line-height-rule:exactly;text-decoration:underline;color:#5C68E2;font-size:26px">
                                                                                 ${order.orderNumber || '#999999'}
                                                                             </a>
@@ -794,7 +794,7 @@ export function newOrderClientEmailTemplate(order){
                                                                                 <td align="center" valign="top"
                                                                                     width="33.33%"
                                                                                     style="Margin:0;border:0;padding-bottom:5px;padding-top:5px;padding-right:5px;padding-left:5px">
-                                                                                    <a target="_blank" href="${siteUrl + '/politica-de-privacidad'}"
+                                                                                    <a target="_blank" href="${SITE_URL + '/politica-de-privacidad'}"
                                                                                         style="mso-line-height-rule:exactly;text-decoration:none;font-family:arial, 'helvetica neue', helvetica, sans-serif;display:block;color:#999999;font-size:12px">Ir
                                                                                         a elmundodelsaquito.es</a></td>
                                                                                 <td align="center" valign="top"
@@ -806,7 +806,7 @@ export function newOrderClientEmailTemplate(order){
                                                                                 <td align="center" valign="top"
                                                                                     width="33.33%"
                                                                                     style="Margin:0;border:0;padding-bottom:5px;padding-top:5px;padding-right:5px;padding-left:5px;border-left:1px solid #cccccc">
-                                                                                    <a target="_blank" href="${siteUrl + '/aviso-legal'}" style="mso-line-height-rule:exactly;text-decoration:none;font-family:arial, 'helvetica neue', helvetica, sans-serif;display:block;color:#999999;font-size:12px">
+                                                                                    <a target="_blank" href="${SITE_URL + '/aviso-legal'}" style="mso-line-height-rule:exactly;text-decoration:none;font-family:arial, 'helvetica neue', helvetica, sans-serif;display:block;color:#999999;font-size:12px">
                                                                                         Avíso legal
                                                                                     </a>
                                                                                 </td>

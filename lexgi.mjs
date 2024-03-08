@@ -7,7 +7,7 @@ import { lexiConfig } from "./lexgi.config.mjs";
 import userExtractor from "./middleware/userExtractor.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { DEFAULT_LEXI_SETTINGS } from "./consts.js";
+import { DEFAULT_LEXI_SETTINGS, SITE_URL } from "./consts.js";
 import fs from "fs";
 import sharp from "sharp";
 import { API_URL } from "./consts.js";
@@ -371,7 +371,7 @@ export function createCollectionEndpoints(collection, router) {
           expiresIn: 20 * 60, // 20 minutos en segundos
         });
 
-        const resetPasswordURL = `http://localhost:4321/reset-password/complete?token=${token}`
+        const resetPasswordURL = `${SITE_URL}/reset-password/complete?token=${token}`
 
         const emailOptions = {
           fromName: "🌍 Elmundo del saquito", // sender address
