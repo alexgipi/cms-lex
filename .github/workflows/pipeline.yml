@@ -25,6 +25,7 @@ jobs:
         echo "PORT=${{ secrets.PORT }}" >> .env
         echo "PUBLIC_API_URL=${{ secrets.PUBLIC_API_URL }}" >> .env
         echo "PUBLIC_UPLOADS_URL=${{ secrets.PUBLIC_UPLOADS_URL }}" >> .env
+        echo "PUBLIC_SITE_URL=${{ secrets.PUBLIC_SITE_URL }}" >> .env
     - name: Run build task
       run: |
         npm run build
