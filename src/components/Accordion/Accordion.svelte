@@ -4,6 +4,7 @@
 	import Sortable from "sortablejs";
 	import { onMount } from 'svelte';
 	import AccordionItem from './AccordionItem.svelte';
+  import { ADMIN_HOST } from "../../../consts";
 	
 	export let collection;
 	export let field;
@@ -56,7 +57,7 @@
 			const newStage = {label: "New element " + (stages.length+1)}
 			formData.append("stage", JSON.stringify(newStage))
 
-			const res = await fetch("http://localhost:4322/partials/element", {
+			const res = await fetch(ADMIN_HOST + "/partials/element", {
 				method: "POST",
 				body: formData,
 				// No necesitas configurar contentType aquí
@@ -83,7 +84,7 @@
 			const newStage = stage;
 			formData.append("stage", JSON.stringify(newStage))
 
-			const res = await fetch("http://localhost:4322/partials/element", {
+			const res = await fetch(ADMIN_HOST + "/partials/element", {
 				method: "POST",
 				body: formData,
 				// No necesitas configurar contentType aquí
