@@ -4,6 +4,7 @@ export const Users = {
     auth: true,
     access: {
       read: () => true,
+      create: () => true
     },
     labels: {
       singular: {
