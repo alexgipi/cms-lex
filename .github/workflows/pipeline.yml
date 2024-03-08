@@ -23,6 +23,7 @@ jobs:
         echo "STRIPE_SK=${{ secrets.STRIPE_SK }}" >> .env
         echo "SECRET=${{ secrets.SECRET }}" >> .env
         echo "PORT=${{ secrets.PORT }}" >> .env
+        echo "PUBLIC_ADMIN_HOST=${{ secrets.PUBLIC_ADMIN_HOST }}" >> .env
         echo "PUBLIC_API_URL=${{ secrets.PUBLIC_API_URL }}" >> .env
         echo "PUBLIC_UPLOADS_URL=${{ secrets.PUBLIC_UPLOADS_URL }}" >> .env
         echo "PUBLIC_SITE_URL=${{ secrets.PUBLIC_SITE_URL }}" >> .env
