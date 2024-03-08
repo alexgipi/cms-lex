@@ -2,7 +2,7 @@
 import Card from "../components/Card.astro";
 import { Collections, DashboardConfig } from "../../lexgi.mjs";
 import Chart from "./Chart.astro";
-import { API_URL } from "../consts.mjs";
+import { API_URL, SITE_URL } from "../consts.mjs";
 
 async function collectionCounter(collectionSlug:string){
   const response = await fetch(API_URL + collectionSlug + '/count');
@@ -53,7 +53,7 @@ await Promise.all(Object.values(Collections).map(async (collection) => {
             </div>
           </div>
 
-          <iframe style="width: 100%;min-height: 900px;border-radius: 9px;" src="http://localhost:4321"></iframe>
+          <iframe style="width: 100%;min-height: 900px;border-radius: 9px;" src={SITE_URL}></iframe>
         </div>
       </div>
     </section>
