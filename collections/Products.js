@@ -144,5 +144,17 @@ export const Products = {
           en: "Out of Stock",
         },
       },
+      {
+        name: "weight",
+        type: "number",
+        default: null,
+        options: {
+          sidebar: true,
+        },
+        label: {
+          es: "Peso",
+          en: "Weight",
+        },
+      },
     ],
 }
