@@ -17,6 +17,7 @@ export const productAttributes = {
     {
       name: "name",
       type: "text",
+      required: true,
       label: {
         es: "Nombre",
         en: "Name",
