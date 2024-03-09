@@ -130,6 +130,7 @@ if(parentName){
           id={field.name}
           type="text"
           value={document ? document[field?.name] : ""}
+          placeholder={field?.placeholder}
         />
       )}
 
@@ -139,6 +140,7 @@ if(parentName){
           id={field.name}
           type="text"
           value={document[field.name]}
+          placeholder={field?.placeholder}
         />
       )}
 
@@ -148,6 +150,7 @@ if(parentName){
           id={field.name}
           type="number"
           value={document[field.name]}
+          placeholder={field?.placeholder}
         />
       )}
 
