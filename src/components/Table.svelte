@@ -3,7 +3,7 @@
     export let documents:any = [];
     let documentsToRender:any[] = documents;
 
-    const title = "Lexgi CMS";
+    const title = "Flexi CMS";
 
     const urlParams = new URLSearchParams(window.location.search);
 

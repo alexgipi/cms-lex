@@ -180,10 +180,10 @@ main()
     }).format(date);
 
     console.log('')
-    console.log(' Lexgi CMS '.inverse.green + ' v1.0.0'.green + ' is ready'.gray);
+    console.log(' Flexi CMS '.inverse.green + ' v1.0.0'.green + ' is ready'.gray);
 
-    console.log(`${formattedDate}`.gray + ` INFO`.green + ' (Lexgi CMS): '.white + 'Connected to MongoDB server successfully!'.blue);
-    console.log(`${formattedDate}`.gray + ` INFO`.green + ' (Lexgi CMS): '.white + 'Starting Lexgi CMS...'.blue);
+    console.log(`${formattedDate}`.gray + ` INFO`.green + ' (Flexi CMS): '.white + 'Connected to MongoDB server successfully!'.blue);
+    console.log(`${formattedDate}`.gray + ` INFO`.green + ' (Flexi CMS): '.white + 'Starting Flexi CMS...'.blue);
 
     const port = process.env.PORT || 3500;
   
@@ -191,7 +191,7 @@ main()
       
       server.listen(port, () => {
         
-        console.log(`${formattedDate}`.gray + ` INFO`.green + ' (Lexgi CMS): '.white + `URL:`.blue + ` http://localhost:${port}`.magenta);
+        console.log(`${formattedDate}`.gray + ` INFO`.green + ' (Flexi CMS): '.white + `URL:`.blue + ` http://localhost:${port}`.magenta);
         console.log(`${formattedDate}`.gray + ` watching for file changes...`.green);
 
       });
