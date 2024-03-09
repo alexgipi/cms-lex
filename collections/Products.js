@@ -151,8 +151,12 @@ export const Products = {
         options: {
           sidebar: true,
         },
+        placeholder: {
+          es: "Peso en kg (Formato decimal)",
+          en: "Ex: 0.5 (500 grams)"
+        },
         label: {
-          es: "Peso",
+          es: "Peso (kg)",
           en: "Weight",
         },
       },
