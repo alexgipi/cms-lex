@@ -2,7 +2,9 @@
     "watch": [
       "./server.js",
       "./lexgi.config.mjs",
-      "./lexgi.mjs"
+      "./lexgi.mjs",
+      "./src/"
     ],
+    "ext": "js, css, mjs, astro, svelte, json, ts",
     "verbose": true
 }
