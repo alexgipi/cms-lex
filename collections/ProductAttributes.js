@@ -31,6 +31,19 @@ export const productAttributes = {
       },
     },
     {
+      name: "label",
+      type: "text",
+      required: true,
+      placeholder: {
+        es: "Ej: Selecciona un color",
+        en: "Ex: Select a color",
+      },
+      label: {
+        es: "Label",
+        en: "Label",
+      },
+    },
+    {
       name: "options",
       type: "text",
       required: true,
