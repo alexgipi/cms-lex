@@ -9,7 +9,7 @@ interface Props {
     placeholder?: string | null;
 }
 
-const { name, id, value, placeholder } = Astro.props;
+const { name, id, value, placeholder }:any = Astro.props;
 const type:any= Astro.props.type;
 ---
 
@@ -27,6 +27,6 @@ const type:any= Astro.props.type;
     id={id} 
     name={name} 
     value={value}
-    placeholder={placeholder}
+    placeholder={placeholder['es']}
     />
 }
