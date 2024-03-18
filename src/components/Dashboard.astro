@@ -31,7 +31,7 @@ await Promise.all(Object.values(Collections).map(async (collection) => {
           <Card
             href={'/admin/'+collection.slug}
             title={collection.name}
-            body={"Esta colección tiene " + collection.fields.length + ' campos.'}
+            body={"Esta colección tiene " + (collection.fields.length + 2) + ' campos.'}
             counter={counters[collection.slug]}
           />
         ))
