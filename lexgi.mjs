@@ -201,7 +201,7 @@ function generateSchema(fields, newSchema = {}, uploadFields = []){
         newSchema[field.name] = [newSchema[field.name]]
       }        
 
-    } else if (field.type === 'row') {
+    } else if (field.type === 'row' || field.type === 'group') {
       console.log(field.fields)
       let data = generateSchema(field.fields);
       newSchema = data["newSchema"];

@@ -71,10 +71,10 @@ if(parentName){
 }
 
 {
-  field?.type !== "row" && (
-    <div class={"form-field flex-col gap-6"}>
-      {field?.type != "row" && (
-        <label for={field?.name}>
+  field?.type === "group" && (
+    
+      <div class="group-field">
+        <h2 class="group-field-title">
           {() => {
             if (typeof field?.label === "object") {
               const result = field?.label[currentLang];
@@ -88,10 +88,42 @@ if(parentName){
               );
             }
           }}
+        </h2>
+        {field?.fields?.map((fieldItem: any) => (
+          <FormFieldChild
+            identity={identity}
+            token={token}
+            field={fieldItem}
+            parentField={field}
+            document={document}
+            collection={collection}
+            fieldCheckedDocsIds={fieldCheckedDocsIds}
+          />
+        ))}
+      </div>   
+  )
+}
 
-          {field?.required && <span class="required-symbol">*</span>}
-        </label>
-      )}
+{
+  field?.type !== "row" && field?.type !== "group" && (
+    <div class={"form-field flex-col gap-6"}>
+      <label for={field?.name}>
+        {() => {
+          if (typeof field?.label === "object") {
+            const result = field?.label[currentLang];
+            return result;
+          } else if (typeof field?.label === "string") {
+            const result = field?.label;
+            return result;
+          } else {
+            return capitalizeFirstLetter(
+              field?.name.replaceAll("_", " ") || ""
+            );
+          }
+        }}
+
+        {field?.required && <span class="required-symbol">*</span>}
+      </label>
 
       {collection?.slug === "users" && field?.type === "password" && (
         <div class="password-update flex flex-col items-start gap-6">

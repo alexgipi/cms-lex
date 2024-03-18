@@ -74,7 +74,7 @@
     
   };
 
-  const title = "Lexgi CMS";
+  const title = "Flexi CMS";
 
   const urlParams = new URLSearchParams(window.location.search);
 

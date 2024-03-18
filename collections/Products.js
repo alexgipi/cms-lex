@@ -84,19 +84,19 @@ export const Products = {
           en: "Description",
         },
       },
-      {
-        name: "image",
-        type: "image",
-        relationTo: "Media",
-        label: {
-          es: "Imagen de producto",
-          en: "Product Image",
-        },
-        default: null,
-        options: {
-          sidebar: true,
-        },
-      },
+      // {
+      //   name: "image",
+      //   type: "image",
+      //   relationTo: "Media",
+      //   label: {
+      //     es: "Imagen de producto",
+      //     en: "Product Image",
+      //   },
+      //   default: null,
+      //   options: {
+      //     sidebar: true,
+      //   },
+      // },
       {
         name: "images",
         type: "images",
