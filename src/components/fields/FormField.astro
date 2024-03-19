@@ -243,7 +243,7 @@ if(parentName){
           <div
             data-dropdown-toggle={field?.name}
             data-dropdown-placement="bottom"
-            class="w-full justify-between text-white bg-violet-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:bg-[#000] border dark:border-[#111] dark:hover:bg-[#111] dark:focus:ring-zinc-800"
+            class="w-full justify-between text-white bg-violet-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:bg-[var(--site-bg)] border dark:border-[#111] dark:hover:bg-[#111] dark:focus:ring-zinc-800"
           >
             <div class="relation-tags flex">
               {field?.docs?.map(
@@ -302,7 +302,7 @@ if(parentName){
 
           <div
             id={field?.name}
-            class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-[#000]"
+            class="z-10 hidden bg-white rounded-lg shadow w-full dark:bg-[var(--site-bg)]"
           >
             <div
               class="combo-field z-10 hidden flex border border-[#111] w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground"
@@ -336,7 +336,7 @@ if(parentName){
                 </svg>
                 <input
                   class="combo-field-search-input flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder="Select new role..."
+                  placeholder="Buscar..."
                   autocomplete="off"
                   autocorrect="off"
                   spellcheck="false"

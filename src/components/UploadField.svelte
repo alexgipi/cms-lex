@@ -128,7 +128,7 @@
     <MediaModal multiple={multiple} identity={identity} on:select={handleSelectedMedia}></MediaModal>
 {/if}
 
-<div class="upload-field flex items-center justify-center flex-col w-full border-2 border-zinc-300 border-dashed rounded-lg cursor-pointer bg-zinc-50 dark:bg-[#000] hover:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-500">
+<div class="upload-field flex items-center justify-center flex-col w-full border-2 border-zinc-300 border-dashed rounded-lg cursor-pointer bg-zinc-50 dark:bg-[var(--site-bg)] hover:bg-zinc-900 dark:border-zinc-800 dark:hover:border-zinc-500">
     <label for={name} class="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer">
         <div class="flex flex-col items-center justify-center pt-6 pb-6">
             <svg class="w-8 h-8 mb-4 text-zinc-500 dark:text-zinc-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">

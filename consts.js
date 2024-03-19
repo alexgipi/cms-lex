@@ -1,6 +1,6 @@
-export const API_URL = import.meta?.env?.PUBLIC_API_URL || `http://localhost:${process.env.PORT || 3500}/api/`;
-export const UPLOADS_URL = import.meta?.env?.PUBLIC_UPLOADS_URL || `http://localhost:${process.env.PORT || 3500}/uploads/`;
-export const ADMIN_HOST = import.meta?.env?.PUBLIC_ADMIN_HOST || `http://localhost:${process.env.PORT || 3500}`;
+export const API_URL = import.meta?.env?.PUBLIC_API_URL || `http://localhost:3500/api/`;
+export const UPLOADS_URL = import.meta?.env?.PUBLIC_UPLOADS_URL || `http://localhost:3500/uploads/`;
+export const ADMIN_HOST = import.meta?.env?.PUBLIC_ADMIN_HOST || `http://localhost:4321`;
 export const SITE_URL = import.meta?.env?.PUBLIC_SITE_URL || 'http://localhost:4322';
 
 export const DEFAULT_LEXI_SETTINGS = {
