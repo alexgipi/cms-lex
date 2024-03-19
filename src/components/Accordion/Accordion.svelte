@@ -4,7 +4,7 @@
 	import Sortable from "sortablejs";
 	import { onMount } from 'svelte';
 	import AccordionItem from './AccordionItem.svelte';
-  import { ADMIN_HOST } from "../../../consts";
+  	import { ADMIN_HOST } from "../../../consts";
 	
 	export let collection;
 	export let field;
@@ -109,20 +109,32 @@
 	const handleMoveUp = (e) => {
 		let index = e.detail.index;
 		if (index > 0) {
+			// Reordenar stages
 			const newStages = [...stages];
 			[newStages[index - 1], newStages[index]] = [newStages[index], newStages[index - 1]];
 			stages = newStages;
+
+			// Reordenar elementData de manera correspondiente
+			const newElementData = [...elementData];
+			[newElementData[index - 1], newElementData[index]] = [newElementData[index], newElementData[index - 1]];
+			elementData = newElementData;
 		}
-	}
+	};
 
 	const handleMoveDown = (e) => {
 		let index = e.detail.index;
 		if (index < stages.length - 1) {
+			// Reordenar stages
 			const newStages = [...stages];
 			[newStages[index], newStages[index + 1]] = [newStages[index + 1], newStages[index]];
 			stages = newStages;
+
+			// Reordenar elementData de manera correspondiente
+			const newElementData = [...elementData];
+			[newElementData[index], newElementData[index + 1]] = [newElementData[index + 1], newElementData[index]];
+			elementData = newElementData;
 		}
-	}
+	};
 
 	function arrayMove(orig, fromIndex, toIndex) {
 		let arr = JSON.parse(JSON.stringify(orig));
@@ -132,14 +144,17 @@
 		return arr;
 	}
 
-	const sort = (e) => {
-		console.log(e)
-		let newStages = arrayMove(
-			[...stages],
-			e.oldIndex,
-			e.newIndex
-		);
+	const sort = async (e) => {
+		console.log(e);
+		const newIndex = e.newIndex;
+		const oldIndex = e.oldIndex;
+
+		// Reordenar stages
+		let newStages = arrayMove([...stages], oldIndex, newIndex);
 		stages = newStages;
+
+		elementData = []
+		await Promise.all(stages.map((stage, index) => loadElementData(stage, index)))
 	};
   </script>
   
