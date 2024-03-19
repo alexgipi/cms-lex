@@ -40,7 +40,7 @@
   @import 'https://cdn.quilljs.com/1.3.6/quill.snow.css';
 
   :global(.ql-toolbar.ql-snow, .ql-container.ql-snow) {
-    border: 1px solid #eeeeee14;
+    border: 1px solid #eeeeee14 !important;
   }
   :global(.ql-toolbar.ql-snow) {
     border-radius: 8px 8px 0 0;
