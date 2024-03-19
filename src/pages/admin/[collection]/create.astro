@@ -170,7 +170,7 @@ function fieldLabel(field:any){
         <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
           
           <header
-            class="page-header sticky top-0 z-30 py-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+            class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between dark:border-zinc-700"
           >
             <div class="flexee-container w-full flex justify-between items-center">
               <div class="flex gap-4">
@@ -287,7 +287,7 @@ function fieldLabel(field:any){
                         <select
                           id={field.name}
                           name={field.name}
-                          class="bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block w-full p-4 dark:bg-[#000] dark:border-[#eeeeee14] dark:placeholder-zinc-400 dark:text-white dark:focus:ring-violet-500 dark:focus:border-violet-500"
+                          class="bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block w-full p-4 dark:bg-[var(--site-bg)] dark:border-[#eeeeee14] dark:placeholder-zinc-400 dark:text-white dark:focus:ring-violet-500 dark:focus:border-violet-500"
                         >
                           <option disabled selected>Choose a {field?.name}</option>
                           
@@ -409,7 +409,7 @@ function fieldLabel(field:any){
                         <select
                           id={field.name}
                           name={field.name}
-                          class="bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block w-full p-4 dark:bg-[#000] dark:border-[#eeeeee14] dark:placeholder-zinc-400 dark:text-white dark:focus:ring-violet-500 dark:focus:border-violet-500"
+                          class="bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block w-full p-4 dark:bg-[var(--site-bg)] dark:border-[#eeeeee14] dark:placeholder-zinc-400 dark:text-white dark:focus:ring-violet-500 dark:focus:border-violet-500"
                         >
                           <option disabled selected>Choose a {field?.name}</option>
                           
@@ -537,5 +537,7 @@ function fieldLabel(field:any){
     height: 30px;
   }
 
-  
+  .page-header {
+    background-color: var(--site-bg);
+  }
 </style>

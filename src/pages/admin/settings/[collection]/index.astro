@@ -206,7 +206,7 @@ if (Astro.request.method === "POST") {
       <main class="main padding-0">
         <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
           <header
-            class="page-header sticky top-0 z-30 py-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+            class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between dark:border-zinc-700"
           >
             <div class="flexee-container w-full flex justify-between items-center">
               <div class="flex gap-4">
@@ -343,4 +343,7 @@ if (Astro.request.method === "POST") {
     height: 30px;
   }
   
+  .page-header {
+    background-color: var(--site-bg);
+  }
 </style>
