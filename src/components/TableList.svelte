@@ -220,7 +220,7 @@
 </script>
 
 <header
-  class="page-header sticky top-0 z-30 py-6 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+  class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between dark:border-zinc-700"
 >
   <div class="flexee-container w-full flex gap-6 justify-between items-center">
     <div class="flex gap-4">
@@ -279,7 +279,7 @@
                 type="text"
                 name="email"
                 id="users-search"
-                class="bg-zinc-50 border border-zinc-300 text-zinc-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 px-4 dark:bg-[#000] dark:border-[#1f1f1f] dark:placeholder-[#898989] dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                class="bg-zinc-50 border border-zinc-300 text-zinc-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 px-4 dark:bg-[var(--site-bg)] dark:border-[#1f1f1f] dark:placeholder-[#898989] dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder={"Buscar..."}
               />
             </div>
@@ -364,7 +364,7 @@
 {#if documents?.length > 0 }
   <div id="main-content" class="flex flex-col flex-auto">
     <div
-    class="flexee-container py-7 bg-white block sm:flex items-center justify-between lg:mt-1.5 dark:bg-[#000] dark:border-zinc-700"
+    class="flexee-container py-7 block sm:flex items-center justify-between dark:border-zinc-700"
     >
       <div class="w-full">
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
@@ -449,7 +449,7 @@
                         id="checkbox-all"
                         aria-describedby="checkbox-1"
                         type="checkbox"
-                        class="w-4 h-4 border-zinc-300 rounded bg-zinc-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-[#9948ff] dark:focus:ring-offset-[#000] dark:text-[#9948ff] dark:ring-offset-zinc-800 dark:bg-zinc-700 dark:border-zinc-600"
+                        class="w-4 h-4 border-zinc-300 rounded bg-zinc-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-[#9948ff] dark:focus:ring-offset-[var(--site-bg)] dark:text-[#9948ff] dark:ring-offset-zinc-800 dark:bg-zinc-700 dark:border-zinc-600"
                       />
                       <label for="checkbox-all" class="sr-only">checkbox</label>
                     </div>
@@ -460,10 +460,10 @@
                       {#if field?.active}
                         <th
                           scope="col"
-                          class="p-3 text-xs font-medium text-left text-zinc-500 uppercase dark:text-zinc-400"
+                          class="p-3 text-xs font-medium text-left text-zinc-500 dark:text-zinc-400"
                         >
-                          <span class="sort-column__label capitalize"
-                            >{field.name || "--"}</span
+                          <span class="sort-column__label"
+                            >{field.label?.es || field.name || "--"}</span
                           >
                         </th>
                       {/if}
@@ -474,7 +474,7 @@
                     scope="col"
                     class="p-3 text-xs font-medium text-left text-zinc-500 uppercase dark:text-zinc-400"
                   >
-                    Actions
+                    Acciones
                   </th>
                 </tr>
               </thead>
@@ -491,7 +491,7 @@
                           id="checkbox-id"
                           aria-describedby="checkbox-1"
                           type="checkbox"
-                          class="w-4 h-4 border-zinc-300 rounded bg-zinc-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-[#9948ff] dark:focus:ring-offset-[#000] dark:text-[#9948ff] dark:ring-offset-zinc-800 dark:bg-zinc-700 dark:border-zinc-600"
+                          class="w-4 h-4 border-zinc-300 rounded bg-zinc-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-[#9948ff] dark:focus:ring-offset-[var(--site-bg)] dark:text-[#9948ff] dark:ring-offset-zinc-800 dark:bg-zinc-700 dark:border-zinc-600"
                         />
                         <label for="checkbox-id" class="sr-only">
                           checkbox
@@ -509,9 +509,12 @@
                             class="min-w-[85px] text-base font-normal text-balance text-zinc-500 text-sm"
                           >
                             {#if key.type === "array"}
-                              {#each document[key.name] as item, index}
-                                <div class="truncate">{item}</div>
-                              {/each}
+                              <div class="truncate">
+                                {document[key.name].length} {key.label['es']}
+                              </div>
+                              <!-- {#each document[key.name] as item, index}
+                                <div class="truncate">{item[key.fields[0].name]}</div>
+                              {/each} -->
                             {:else if key.type === "image"}
                               <div class="flex gap-2">
                                 {#if document[key.name] === null}
@@ -791,6 +794,7 @@ backdropClass='fixed inset-0 z-40 bg-zinc-900 bg-opacity-50 backdrop-blur-sm dar
 
   .page-header {
     height: 90px;
+    background-color: var(--site-bg);
   }
 
   .no-content-section {
