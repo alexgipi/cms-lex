@@ -151,7 +151,7 @@ if(parentName){
           client:load
           id={field.name}
           name={finalName || field.name}
-          value={document[field.name]}
+          value={document ? document[field.name] : ""}
         />
       )}
 
@@ -181,7 +181,7 @@ if(parentName){
           name={finalName || field.name}
           id={field.name}
           type="text"
-          value={document[field.name]}
+          value={document ? document[field.name] : ""}
           placeholder={field?.placeholder}
         />
       )}
@@ -191,7 +191,7 @@ if(parentName){
           name={finalName || field.name}
           id={field.name}
           type="number"
-          value={document[field.name]}
+          value={document ? document[field.name] : ""}
           placeholder={field?.placeholder}
         />
       )}
@@ -202,8 +202,8 @@ if(parentName){
           identity={identity}
           collection={collection}
           name={finalName || field.name}
-          file={!field?.hasMany ? document[field.name] : null}
-          files={field?.hasMany ? document[field.name] : []}
+          file={!field?.hasMany && document ? document[field.name] : null}
+          files={field?.hasMany && document ? document[field.name] : []}
           multiple={field?.type === "images"}
         />
       )}
@@ -213,7 +213,7 @@ if(parentName){
           id={field.name}
           name={finalName || field.name}
           options={field?.enum}
-          currentOption={document[field?.name]}
+          currentOption={document ? document[field?.name] : null}
         />
       )}
 
@@ -226,11 +226,11 @@ if(parentName){
       )}
 
       {field?.type === "boolean" && (
-        <BooleanField name={finalName || field.name} currentValue={document[field.name]} />
+        <BooleanField name={finalName || field.name} currentValue={document ? document[field.name] : ""} />
       )}
 
       {field?.type === "object" && (
-        <ObjectField objectValue={document[field.name]} />
+        <ObjectField objectValue={document ? document[field.name] : ""} />
       )}
 
       {field?.type === "array" && (
@@ -256,7 +256,7 @@ if(parentName){
             class="w-full justify-between text-white bg-violet-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-5 py-4 text-center inline-flex items-center dark:bg-[var(--site-bg)] border dark:border-[#111] dark:hover:bg-[#111] dark:focus:ring-zinc-800"
           >
             <div class="relation-tags flex">
-              {field?.docs?.map(
+              {fieldCheckedDocsIds && field?.docs?.map(
                 (doc: any) =>
                   fieldCheckedDocsIds[field?.name]?.indexOf(doc._id) !== -1 && (
                     <span
@@ -394,7 +394,7 @@ if(parentName){
 
                           <input
                             checked={
-                              fieldCheckedDocsIds[field?.name]?.indexOf(
+                              fieldCheckedDocsIds && fieldCheckedDocsIds[field?.name]?.indexOf(
                                 doc._id
                               ) !== -1
                             }
