@@ -4,7 +4,7 @@
 	import Sortable from "sortablejs";
 	import { onMount } from 'svelte';
 	import AccordionItem from './AccordionItem.svelte';
-  	import { ADMIN_HOST } from "../../../consts";
+  	import { ADMIN_HOST } from "../../consts.mjs";
 	
 	export let collection;
 	export let field;
