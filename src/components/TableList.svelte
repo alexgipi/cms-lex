@@ -795,6 +795,7 @@ backdropClass='fixed inset-0 z-40 bg-zinc-900 bg-opacity-50 backdrop-blur-sm dar
   .page-header {
     height: 90px;
     background-color: var(--site-bg);
+    border-bottom: 1px solid rgb(255 255 255 / 7%) !important;
   }
 
   .no-content-section {
