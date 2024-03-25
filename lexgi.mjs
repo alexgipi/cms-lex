@@ -42,6 +42,9 @@ const fieldTypeTypes = {
     password: {
       type: String,
     },
+    textarea: {
+      type: String
+    },
     richText: {
       type: String,
     },
@@ -74,6 +77,9 @@ const fieldTypeTypes = {
     },
     row: {
       type: Array
+    },
+    group: {
+      type: Object
     }
 };
 
@@ -201,8 +207,12 @@ function generateSchema(fields, newSchema = {}, uploadFields = []){
         newSchema[field.name] = [newSchema[field.name]]
       }        
 
-    } else if (field.type === 'row' || field.type === 'group') {
-      console.log(field.fields)
+    } else if (field.type === 'row') {
+      let data = generateSchema(field.fields);
+      newSchema = data["newSchema"];
+      uploadFields = data["uploadFields"];
+
+    } else if (field.type === 'group') {
       let data = generateSchema(field.fields);
       newSchema = data["newSchema"];
       uploadFields = data["uploadFields"];

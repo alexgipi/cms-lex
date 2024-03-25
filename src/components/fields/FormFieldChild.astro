@@ -9,9 +9,10 @@ interface Props {
     parentField?: any,
     document?: any,
     fieldCheckedDocsIds?:any
+    fieldName?:any;
 }
 
-const {identity, token, field, parentField, document, collection, fieldCheckedDocsIds }:any = Astro.props;
+const {identity, token, field, parentField, document, collection, fieldCheckedDocsIds, fieldName }:any = Astro.props;
 
 ---
 
@@ -19,6 +20,7 @@ const {identity, token, field, parentField, document, collection, fieldCheckedDo
   identity={identity}
   token={token}
   field={field}
+  fieldName={fieldName}
   parentField={parentField}
   document={document}
   collection={collection}

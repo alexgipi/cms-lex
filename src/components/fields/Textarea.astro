@@ -1,0 +1,21 @@
+---
+import { formatDate } from '../../../utils';
+
+interface Props {
+    name: string | null;
+    id?: string | null;
+    value?: string | null;
+    placeholder?: string | null;
+}
+
+const { name, id, value, placeholder }:any = Astro.props;
+---
+
+<textarea
+id={id} 
+name={name} 
+placeholder={placeholder?.es}
+>
+{value}
+</textarea>
+
