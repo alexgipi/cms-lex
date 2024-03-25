@@ -157,7 +157,6 @@
   </script>
   
   <div>
-	{ADMIN_HOST}
 	<button
 	  on:click={handleClick}
 	  type="button"
