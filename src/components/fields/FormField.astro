@@ -3,14 +3,13 @@ import { capitalizeFirstLetter } from "../../../utils";
 import MyRich from "../MyRich.svelte";
 import PasswordField from "../PasswordField.svelte";
 import UploadField from "../UploadField.svelte";
-import BooleanField from "../fields/BooleanField.astro";
-import InputField from "../fields/InputField.astro";
-import SelectField from "../fields/SelectField.astro";
-import ObjectField from "../fields/ObjectField.svelte";
-import FormFieldChild from "../fields/FormFieldChild.astro";
-import FieldFormRowAccordion from "../FieldFormRowAccordion.astro";
+import BooleanField from "./BooleanField.astro";
+import InputField from "./InputField.astro";
+import SelectField from "./SelectField.astro";
+import ObjectField from "./ObjectField.svelte";
+import FormFieldChild from "./FormFieldChild.astro";
 import Accordion from "../Accordion/Accordion.svelte";
-import AccordionItem from "../Accordion/AccordionItem.svelte";
+import Textarea from "./Textarea.astro";
 
 let stages = [
   { id: 1, name: "Antifaces de semillas" },
@@ -95,6 +94,7 @@ if(parentName){
             token={token}
             field={fieldItem}
             parentField={field}
+            fieldName={field.name + '___' + fieldItem.name}
             document={document}
             collection={collection}
             fieldCheckedDocsIds={fieldCheckedDocsIds}
@@ -152,6 +152,16 @@ if(parentName){
           id={field.name}
           name={finalName || field.name}
           value={document[field.name]}
+        />
+      )}
+
+      {field?.type === "textarea" && (
+        
+        <Textarea
+          name={finalName || field.name}
+          id={field.name}
+          value={document ? document[field?.name] : ""}
+          placeholder={field?.placeholder}
         />
       )}
 
