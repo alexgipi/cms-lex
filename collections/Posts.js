@@ -1,5 +1,5 @@
 export const Posts = {
-    name: 'posts',
+    name: 'Posts',
     useAsTitle: 'editor',
     labels: {
       singular: {
