@@ -6,6 +6,7 @@ import { Orders } from "./collections/Orders.js";
 import { Media } from "./collections/Media.js";
 import { Menus } from "./collections/Menus.js";
 import { Pages } from "./collections/Pages.js";
+import { Posts } from "./collections/Posts.js";
 
 export const CollectionsConfig = [
   Users,
@@ -16,6 +17,7 @@ export const CollectionsConfig = [
   Media,
   Menus,
   Pages,
+  Posts
 ];
 
 export const lexiConfig = {
