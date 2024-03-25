@@ -12,8 +12,6 @@
 	export let itemIndex;
 	export let parentName;
 
-	console.log({stages})
-
 	let foo;
 
 	let elementData = [];
@@ -159,6 +157,7 @@
   </script>
   
   <div>
+	{ADMIN_HOST}
 	<button
 	  on:click={handleClick}
 	  type="button"
