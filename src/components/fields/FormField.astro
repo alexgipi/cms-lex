@@ -238,7 +238,7 @@ if(parentName){
           <Accordion
             collection={collection}
             field={field}
-            stages={document[field?.name]}
+            stages={document ? document[field.name] : []}
             client:load
             itemIndex={itemIndex}
             parentName={fieldName}
