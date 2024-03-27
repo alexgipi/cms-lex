@@ -220,7 +220,7 @@
 </script>
 
 <header
-  class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between dark:border-zinc-700"
+  class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between"
 >
   <div class="flexee-container w-full flex gap-6 justify-between items-center">
     <div class="flex gap-4">
@@ -273,13 +273,12 @@
       <div class="sm:flex flex-auto">
         <div class="items-center hidden mb-3 sm:flex sm:mb-0">
           <form class="lg:pr-3" action="/" method="GET">
-            <label for="users-search" class="sr-only">Search</label>
             <div class="relative lg:w-64 xl:w-96">
               <input
                 type="text"
                 name="email"
                 id="users-search"
-                class="bg-zinc-50 border border-zinc-300 text-zinc-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 px-4 dark:bg-[var(--site-bg)] dark:border-[#1f1f1f] dark:placeholder-[#898989] dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                class="border text-zinc-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 px-4 border-none dark:bg-[#111] dark:placeholder-[#898989] dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder={"Buscar..."}
               />
             </div>
@@ -508,9 +507,9 @@
                           <div
                             class="min-w-[85px] text-base font-normal text-balance text-zinc-500 text-sm"
                           >
-                            {#if key.type === "array"}
+                            {#if key.type === "array" && document}
                               <div class="truncate">
-                                {document[key.name].length} {key.label['es']}
+                                {document[key.name]?.length || 0} {key.label['es']}
                               </div>
                               <!-- {#each document[key.name] as item, index}
                                 <div class="truncate">{item[key.fields[0].name]}</div>
@@ -793,9 +792,9 @@ backdropClass='fixed inset-0 z-40 bg-zinc-900 bg-opacity-50 backdrop-blur-sm dar
   }
 
   .page-header {
-    height: 90px;
+    min-height: 90px;
     background-color: var(--site-bg);
-    border-bottom: 1px solid rgb(255 255 255 / 7%) !important;
+    border-bottom: 1px solid rgb(255 255 255 / 5%);
   }
 
   .no-content-section {
