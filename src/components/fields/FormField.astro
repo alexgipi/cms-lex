@@ -30,6 +30,7 @@ interface Props {
   itemIndex?:any;
   parentName?:any;
   fieldName?:any;
+  name?:any;
 }
 
 const {
@@ -42,12 +43,14 @@ const {
   fieldCheckedDocsIds,
   itemIndex,
   parentName,
-  fieldName
+  fieldName,
+  name
 }: any = Astro.props;
 
 let finalName = fieldName;
 if(parentName){
-  finalName = `${parentName}.${itemIndex}.${field.name}`
+  // console.log({name})
+  finalName = `${name}[${itemIndex}][${field.name}]`
 }
 ---
 
@@ -94,7 +97,7 @@ if(parentName){
             token={token}
             field={fieldItem}
             parentField={field}
-            fieldName={field.name + '___' + fieldItem.name}
+            fieldName={`${field.name}[${fieldItem.name}]`}
             document={document}
             collection={collection}
             fieldCheckedDocsIds={fieldCheckedDocsIds}
@@ -160,18 +163,31 @@ if(parentName){
         <Textarea
           name={finalName || field.name}
           id={field.name}
-          value={document ? document[field?.name] : ""}
+          value={ 
+            document 
+            ? 
+            parentField?.type === 'group' ? document[parentField?.name]?.[field?.name] : document[field?.name] 
+            : 
+            ""            
+          }
           placeholder={field?.placeholder}
         />
       )}
 
       {field?.type === "text" && (
+        // <strong>{itemIndex} - {field.name}</strong>
         
         <InputField
-          name={finalName || field.name}
+          name={ name ? `${name}[${itemIndex}][${field.name}]` : finalName || field.name}
           id={field.name}
           type="text"
-          value={document ? document[field?.name] : ""}
+          value={ 
+            document 
+            ? 
+            parentField?.type === 'group' ? document[parentField?.name]?.[field?.name] : document[field?.name] 
+            : 
+            ""            
+          }
           placeholder={field?.placeholder}
         />
       )}
@@ -235,16 +251,45 @@ if(parentName){
 
       {field?.type === "array" && (
         <div class="array-field flex flex-col gap-4">
-          <Accordion
-            collection={collection}
-            field={field}
-            stages={document ? document[field.name] : []}
-            client:load
-            itemIndex={itemIndex}
-            parentName={fieldName}
-          >
+          { parentField?.type === 'array' ?
+            <Accordion
+              collection={collection}
+              name={finalName}
+              field={field}
+              stages={ 
+                document 
+                ? 
+                document[field.name]
+                : 
+                document[field?.name]          
+              }
+              client:load
+              itemIndex={itemIndex}
+              parentName={fieldName}
+            >
+            
+            </Accordion>
+          :
+            <Accordion
+              collection={collection}
+              field={field}
+              name={finalName}
+              stages={ 
+                document 
+                ? 
+                parentField?.type === 'group' ? document[parentField?.name]?.[field?.name] : document[field?.name] 
+                : 
+                []           
+              }
+              
+              client:load
+              itemIndex={itemIndex}
+              parentName={fieldName}
+            >
+            
+            </Accordion>
+          }
           
-          </Accordion>
         </div>
       )}
 
