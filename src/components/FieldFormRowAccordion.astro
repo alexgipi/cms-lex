@@ -11,10 +11,11 @@ interface Props {
   fieldCheckedDocsIds?:any,
   itemIndex?:any,
   parentName?:any,
-  stage?:any
+  name?:any
+  stage?:any,
 }
 
-const {collection, field, parentField, document, fieldCheckedDocsIds, itemIndex, parentName, stage }:any = Astro.props;
+const {collection, field, parentField, document, fieldCheckedDocsIds, itemIndex,name, parentName, stage }:any = Astro.props;
 
 ---
-<FieldFormRow parentField={parentField} parentName={parentName} collection={collection} field={field} itemIndex={itemIndex}, document={stage}></FieldFormRow>
+<FieldFormRow parentField={parentField} parentName={parentName} name={name} collection={collection} field={field} itemIndex={itemIndex}, document={stage}></FieldFormRow>
