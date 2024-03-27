@@ -246,14 +246,14 @@ function assignValue(obj:any, path:any, value:any) {
       <main class="main padding-0">
         <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
           <header
-            class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between dark:border-zinc-700"
+            class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between"
           >
             <div class="flexee-container w-full flex justify-between items-center">
               <div class="flex gap-4">
                 <h1
                   class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
                 >
-                  { collection?.useAsTitle ? document[collection?.useAsTitle] : document?.name || document?.slug || document?._id}
+                  { collection?.useAsTitle ? document?.[collection?.useAsTitle] : document?.name || document?.slug || document?._id}
                 </h1>
                 
                 <a
@@ -294,7 +294,7 @@ function assignValue(obj:any, path:any, value:any) {
             </div>
           </header>
 
-          <div class="flexee-container document-form flex-auto">
+          <div class={"flexee-container flex-auto document-form" + (sidebarFields.length > 0 ? ' document-form--with-sidebar' : '')}>
             <div class="document-form__main flex flex-col gap-6">
               {
                 mainFields.map((field:any) => (
@@ -344,7 +344,8 @@ function assignValue(obj:any, path:any, value:any) {
   }
 
   .page-header {
-    border-bottom: 1px solid rgb(255 255 255 / 7%) !important;
+    min-height: 90px;
+    border-bottom: 1px solid rgb(255 255 255 / 5%);
     background-color: var(--site-bg);
   }
 
@@ -374,25 +375,32 @@ function assignValue(obj:any, path:any, value:any) {
 
   .document-form {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .document-form--with-sidebar {
+    display: grid;
     grid-template-columns: 1fr 490px;
+
+    & .document-form__aside {
+      padding-left: 4rem;
+    }
+
+    & .document-form__main {
+      padding-right: 4rem;
+    }
   }
 
   .document-form__aside,
   .document-form__main {
     flex: auto;
-    padding: 3rem 4rem;
-  }
-
-
-  .document-form__main {
-    padding-left: 0;
+    padding: 3rem 0;
   }
 
   .document-form__aside {
     max-width: 490px;
-    border-left: 1px solid rgb(255 255 255 / 7%);
+    border-left: 1px solid rgb(255 255 255 / 5%);
     width: 100%;
-    padding-right: 0;
   }
 
   .rich-text-editor {
