@@ -27,7 +27,7 @@ export const Pages = {
       name: "slug",
       type: "text",
       unique: true,
-      default: null,
+      required: true,
       options: {
         sidebar: true,
       },
