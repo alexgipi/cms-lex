@@ -102,38 +102,69 @@ if(collection === 'settings'){
                 <a
                   href={`/admin/${collectionSlug}/create`}
                   type="button"
-                  data-modal-target="add-user-modal"
-                  data-modal-toggle="add-user-modal"
-                  class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700"
                 >
-                <svg
-            class="w-5 h-5 mr-2 -ml-1"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-            ><path
-              fill-rule="evenodd"
-              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-              clip-rule="evenodd"></path></svg>
+                  <svg
+                  class="w-5 h-5 mr-2 -ml-1"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                      clip-rule="evenodd">
+                    </path>
+                  </svg>
                   Añadir
                 </a>
+
+                <div
+                  class="api-url-panel"
+                >
+                  <CopyClipboard url={`${API_URL}${collectionSlug}`}></CopyClipboard>
+                  <div
+                    style="
+                          font-size: 0.95em;
+                          display: flex;
+                          align-items: center;
+                          gap: 15px;
+                      "
+                  >
+                    <div class="flex">
+                      <label
+                        class="relative inline-flex items-center cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked=""
+                          class="simple-checkbox"
+                        />
+                        <span
+                          class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300"
+                          >Authentication</span
+                        >
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="flex gap-4 items-center">
                 <div class="flex mr-4">
-                  <label
+                  <a href={`/admin/${collectionSlug}`}
                     class="relative inline-flex items-center cursor-pointer"
                   >
                     <input type="checkbox" checked class="sr-only peer" />
-                    <a href={`/admin/${collectionSlug}`}
+                    <span 
                       class="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-violet-600"
                     >
-                    </a>
+                    </span>
                     <span
                       class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300"
                       >Ver API Rest</span
                     >
-                  </label>
+                  </a>
                 </div>
               </div>
             </div>
@@ -143,35 +174,6 @@ if(collection === 'settings'){
             class={"flexee-container flex-auto document-form"}
           >
             <div class="document-form__main flex flex-col gap-6">
-              <div
-                class="api-url-panel"
-              >
-                <CopyClipboard url={`${API_URL}${collectionSlug}`}></CopyClipboard>
-                <div
-                  style="
-                        font-size: 0.95em;
-                        display: flex;
-                        align-items: center;
-                        gap: 15px;
-                    "
-                >
-                  <div class="flex">
-                    <label
-                      class="relative inline-flex items-center cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked=""
-                        class="simple-checkbox"
-                      />
-                      <span
-                        class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300"
-                        >Authentication</span
-                      >
-                    </label>
-                  </div>
-                </div>
-              </div>
               <JsonTree customClass={"no-padding-tree"} jsonData={documents} />
             </div>
           </div>
@@ -217,21 +219,20 @@ if(collection === 'settings'){
 
   .document-form__main {
     flex: auto;
-    padding-bottom: 3rem;
+    padding: 3rem 0;
   }
 
   .api-url-panel {
-    margin: 0 -4rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.75rem 4rem;
+    padding: 0 2rem;
     background: #090909c2;
     position: sticky;
     top: 90px;
     backdrop-filter: blur(20px);
     z-index: 9;
-    border-bottom: 1px solid #22222273;
+    gap: 2rem;
   }
   .simple-checkbox {
     width: 22px;
