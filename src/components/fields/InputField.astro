@@ -18,7 +18,7 @@ const type:any= Astro.props.type;
     type={type || 'text'} 
     id={id} 
     name={name} 
-    value={formatDate(value)}
+    value={formatDate(value || new Date())}
     readonly
     />
     :
