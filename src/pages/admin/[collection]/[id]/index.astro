@@ -1,11 +1,12 @@
 ---
-import Layout from "../../../layouts/Layout.astro";
-import Aside from "../../../components/Aside.astro";
-import Header from "../../../components/Header.astro";
-import { getCollection } from "../../../../lexgi.mjs";
-import { slugify } from "../../../../utils.js"
-import { API_URL } from "../../../consts.mjs";
-import FieldFormRow from "../../../components/FieldFormRow.astro";
+import Layout from "../../../../layouts/Layout.astro";
+import Aside from "../../../../components/Aside.astro";
+import Header from "../../../../components/Header.astro";
+import { getCollection } from "../../../../../lexgi.mjs";
+import { slugify } from "../../../../../utils.js"
+import { API_URL } from "../../../../consts.mjs";
+import FieldFormRow from "../../../../components/FieldFormRow.astro";
+import JsonTree from "../../../../components/JsonTree/JsonTree.astro";
 
 const identityCookieValue = Astro.cookies.get("identity")?.value;
 
@@ -119,7 +120,7 @@ async function getCollectionDocById(id:string){
       }
     );
 
-    const data = await res.json();
+    const data = await res?.json();
 
     return data;
 
@@ -129,7 +130,7 @@ async function getCollectionDocById(id:string){
 }
 
 function getRelationDocsChecked(field:any){
-  const arrayOfDocs = document[field.name]
+  const arrayOfDocs = document?.[field.name]
   fieldCheckedDocsIds[field.name] = [];
   
   if (field.hasMany){
@@ -273,7 +274,7 @@ function assignValue(obj:any, path:any, value:any) {
                       d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                       clip-rule="evenodd"></path></svg
                   >
-                   Add new
+                   Añadir
                 </a>
               </div>
 
@@ -282,8 +283,8 @@ function assignValue(obj:any, path:any, value:any) {
                   
                   <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" value="" class="sr-only peer">
-                    <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-violet-600"></div>
-                    <span class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300">View API Rest</span>
+                    <a href={id + '/api'} class="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-violet-600"></a>
+                    <span class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300">Ver API Rest</span>
                   </label>
 
                 </div>

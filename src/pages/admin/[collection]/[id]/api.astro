@@ -1,0 +1,226 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import Aside from "../../../../components/Aside.astro";
+import Header from "../../../../components/Header.astro";
+import { getCollection } from "../../../../../lexgi.mjs";
+import { API_URL } from "../../../../consts.mjs";
+import FieldFormRow from "../../../../components/FieldFormRow.astro";
+import JsonTree from "../../../../components/JsonTree/JsonTree.astro";
+import CopyClipboardUrl from "../../../../components/CopyClipboardUrl.astro";
+
+const identityCookieValue = Astro.cookies.get("identity")?.value;
+
+let identity = null;
+let token: string | null = null;
+
+try {
+  if (identityCookieValue) {
+    identity = JSON.parse(identityCookieValue);
+    token = identity.token;
+  }
+} catch (error) {
+  console.error("Error al analizar el valor de la cookie:", error);
+}
+
+const currentLang = "es";
+const title = "Flexi CMS";
+const { collection: collectionSlug, id } = Astro.params;
+const document = await getCollectionDocById(id || "");
+
+const collection = getCollection(collectionSlug);
+
+async function getCollectionDocById(id: string) {
+  try {
+    const res = await fetch(API_URL + collectionSlug + "/" + id, {
+      method: "GET",
+    });
+
+    const data = await res?.json();
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+---
+
+<Layout title={collectionSlug}>
+  <div class="layout aside-opened">
+    <button class="toggle-aside-button" data-toggle-nav id="toggle-nav">
+      <svg
+        class="icon-open-menu"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <Aside />
+    <div class="layout-content">
+      <Header collection={collection} breadcumbAction="Update" />
+      <main class="main padding-0">
+        <div
+          class="create-document flex-auto flex flex-col"
+        >
+          <header
+            class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between"
+          >
+            <div
+              class="flexee-container w-full flex justify-between items-center"
+            >
+              <div class="flex gap-4">
+                <h1
+                  class="text-xl font-semibold text-zinc-900 sm:text-2xl dark:text-white"
+                >
+                  {
+                    collection?.useAsTitle
+                      ? document?.[collection?.useAsTitle]
+                      : document?.name || document?.slug || document?._id
+                  }
+                </h1>
+
+                <a
+                  href={`/admin/${collectionSlug}/${id}`}
+                  type="button"
+                  data-modal-target="add-user-modal"
+                  data-modal-toggle="add-user-modal"
+                  class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >
+                <svg class="w-4 h-4 mr-2 s-CDdd1bnuogp7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" class="s-CDdd1bnuogp7"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" class="s-CDdd1bnuogp7"></path></svg>
+                  Editar
+                </a>
+              </div>
+
+              <div class="flex gap-4 items-center">
+                <div class="flex mr-4">
+                  <label
+                    class="relative inline-flex items-center cursor-pointer"
+                  >
+                    <input type="checkbox" checked class="sr-only peer" />
+                    <a href={`/admin/${collectionSlug}/${id}`}
+                      class="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-violet-600"
+                    >
+                    </a>
+                    <span
+                      class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300"
+                      >Ver API Rest</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div
+            class={"flexee-container flex-auto document-form"}
+          >
+            <div class="document-form__main flex flex-col gap-6">
+              <div
+                class="api-url-panel"
+              > 
+              <CopyClipboardUrl url={`${API_URL}${collectionSlug}/${id}`}></CopyClipboardUrl>
+
+                <div
+                  style="
+                        font-size: 0.95em;
+                        /* opacity: 0.6; */
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                    "
+                >
+                  <div class="flex">
+                    <label
+                      class="relative inline-flex items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked=""
+                        class="simple-checkbox"
+                      />
+                      <span
+                        class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300"
+                        >Authentication</span
+                      >
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <JsonTree customClass={"no-padding-tree"} jsonData={document} />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const toggleNavBtn = document.querySelector("[data-toggle-nav]");
+  const layout = document.querySelector(".layout");
+  const aside = document.querySelector(".aside");
+
+  toggleNavBtn?.addEventListener("click", () => {
+    if (layout?.classList.contains("aside-opened")) {
+      layout?.classList.remove("aside-opened");
+      aside?.classList.remove("aside-opened");
+    } else {
+      layout?.classList.add("aside-opened");
+      aside?.classList.add("aside-opened");
+    }
+  });
+</script>
+
+<style>
+  h1 {
+    margin: 0;
+  }
+
+  .page-header {
+    min-height: 90px;
+    border-bottom: 1px solid rgb(255 255 255 / 5%);
+    background-color: var(--site-bg);
+  }
+
+  .document-form {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .document-form__main {
+    flex: auto;
+    padding-bottom: 3rem;
+  }
+
+  .api-url-panel {
+    margin: 0 -4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.75rem 4rem;
+    background: #090909c2;
+    position: sticky;
+    top: 90px;
+    backdrop-filter: blur(20px);
+    z-index: 9;
+    border-bottom: 1px solid #22222273;
+  }
+
+  .simple-checkbox {
+    width: 22px;
+    height: 21px;
+    color: #7c3aed;
+    border-radius: 4px;
+    border-color: transparent;
+    box-shadow: none;
+  }
+</style>

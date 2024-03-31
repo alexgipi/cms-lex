@@ -1,0 +1,47 @@
+---
+const {url, label = 'Copiar URL'} = Astro.props;
+---
+
+<div class="copy-url-clipboard">
+    {url} 
+    <button id="copyButton" data-url={url}>
+        {label}
+    </button>
+</div>
+
+<style>
+    .copy-url-clipboard {
+        font-size: 0.9em;
+        opacity: 0.6;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .copy-url-clipboard button {
+        padding: .25rem .75rem;
+        font-size: 0.82em;
+        background: #242424;
+        border-radius: 6px;
+    }
+</style>
+
+<script>
+    const button:any = (document.getElementById('copyButton') as any);
+
+    button?.addEventListener('click', function() {
+        let url = button.getAttribute('data-url'); // Obtener la URL del atributo data-url del botón
+
+        // Crear un elemento de texto temporal para copiar la URL
+        var tempInput = document.createElement('input');
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+
+        // Seleccionar y copiar la URL al Portapapeles
+        tempInput.select();
+        document.execCommand('copy');
+
+        // Eliminar el elemento temporal
+        document.body.removeChild(tempInput);
+    });
+</script>
