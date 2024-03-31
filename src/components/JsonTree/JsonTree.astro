@@ -1,0 +1,137 @@
+---
+interface Props {
+  jsonData: Object | any[],
+  id?: string,
+  customClass?:string
+}
+// Ejemplo de JSON para visualizar
+const defaultJson = {};
+
+const { jsonData, id = 'tree', customClass } = Astro.props;
+---
+
+<script>
+  import buildTree from 'flexi-json-tree';
+
+  // Inicializar el árbol
+  document.addEventListener("DOMContentLoaded", (e) => {
+
+    const nodes = document.querySelectorAll(".node");
+
+    nodes.forEach(node => {
+      buildTree('#'+node.id)
+    });
+    
+  })
+
+</script>
+
+<div 
+class={`node ${customClass ? customClass : ''}`} 
+id={id} 
+data-json={JSON.stringify(jsonData || defaultJson, null, 4)}
+></div>
+
+<style is:global>
+  .node {
+    margin: 0;
+    padding: 2rem;
+    background: #111;
+    border-radius: 0.75rem;
+    font-family: monospace;
+  }
+  .node ul {
+    border-left: 2px dotted #242424;
+    margin: 0;
+    padding-left: .75rem;
+  }
+  .node li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    padding-left: 1.25rem
+  }
+
+  .node-toggle {
+    cursor: pointer;
+  }
+  .node-toggle::before {
+    content: "▸";
+    position: absolute;
+    left: -20px;
+  }
+  .collapsed > ul {
+    display: none;
+  }
+  .collapsed > .node-toggle::before {
+    content: "▾";
+  }
+
+
+  .collapsed:after {
+    content: attr(data-size);
+    color: #a8a8a875;
+    margin-left: 12px;
+  }
+
+  .tree-more-dots { display: none }
+
+  .collapsed .tree-more-dots {
+    display: inline;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  .e {
+    color: #fff;
+    opacity: 0.25;
+  }
+  .e {
+    width: 20px;
+    height: 18px;
+    position: absolute;
+    left: 0;
+    top: 6px;
+    color: white;
+    z-index: 5;
+    background-repeat: no-repeat;
+    background-position: center center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.25;
+    line-height: 1;
+  }
+
+  .e::after {
+      content: '';
+      display: block;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 4px 0 4px 6.9px;
+      border-color: transparent transparent transparent currentColor;
+      transform: rotate(90deg) translateY(1px);
+  }
+
+  .e:hover {
+    opacity: 0.45;
+  }
+
+  .collapsed > .e::after {
+    transform: none;
+  }
+
+  .token.null {
+    color: hsl(200, 100%, 70%);
+  }
+
+  .no-padding-tree {
+    padding: 0;
+    background-color: transparent;
+    margin-left: -1.25rem;
+  }
+</style>

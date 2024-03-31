@@ -6,14 +6,7 @@
     export let field;
 	export let index;
 
-	let foo;
 	const dispatch = createEventDispatcher()
-
-	export let stages = [
-		{ id: 1, name: 'Antifaces de semillas' },
-		{ id: 2, name: 'Sacos de semillas' },
-		{ id: 3, name: 'Zapatillas térmicas' },
-	];
 
 	const handleMoveUp = (e) => {
 		dispatch('moveUp', {stage, index})
@@ -44,7 +37,7 @@
         <div class="flex flex-auto items-center gap-5 justify-between">
             <div class="flex items-center gap-5 first">
                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 24 24" style="width: 24px;height: 24px;fill: #505050;cursor: grab;" xml:space="preserve" class=""><g><circle cx="8" cy="4" r="2" opacity="1" class=""></circle><circle cx="8" cy="12" r="2" opacity="1" class=""></circle><circle cx="8" cy="20" r="2" opacity="1" class=""></circle><circle cx="16" cy="4" r="2" opacity="1" class=""></circle><circle cx="16" cy="12" r="2" opacity="1" class=""></circle><circle cx="16" cy="20" r="2" opacity="1" class=""></circle></g></svg>
-                {stage.label || 'Element ' + (index+1)}
+                {stage?.[field?.useAsTitle] || 'Element ' + (index+1)}
             </div>
 
             <div class="accordion-item-summary-actions flex gap-2 last">
@@ -91,13 +84,17 @@
 	}
 
 	details {
-		background-color: #101010b5;
+		background-color: #1010104a;
 		border-radius: 8px;
+		border: 1px solid #4646461c;
 	}
 
 	details article {
 		padding: 1.25rem 2rem;
 		border-top: 1px solid #171717;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
 	}
 
 	.accordion-item-summary-actions {

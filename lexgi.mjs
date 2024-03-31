@@ -208,15 +208,16 @@ function generateSchema(fields, newSchema = {}, uploadFields = []){
       }        
 
     } else if (field.type === 'row') {
-      let data = generateSchema(field.fields);
-      newSchema = data["newSchema"];
-      uploadFields = data["uploadFields"];
+      let rowSchema = generateSchema(field.fields);
+      const combinedSchema = {...newSchema, ... rowSchema["newSchema"]}
+      newSchema = combinedSchema;
 
     } else if (field.type === 'group') {
-      let data = generateSchema(field.fields);
-      newSchema = data["newSchema"];
-      uploadFields = data["uploadFields"];
-
+      let rowSchema = generateSchema(field.fields);
+      newSchema[field.name] = rowSchema["newSchema"];
+    } else if (field.type === 'array') {
+      let rowSchema = generateSchema(field.fields);
+      newSchema[field.name] = [rowSchema["newSchema"]];
     } else {
 
       if (field.type === 'images' || field.type === 'image'){
@@ -268,6 +269,10 @@ function generateSchema(fields, newSchema = {}, uploadFields = []){
 
     if(field.type === 'images'){
       uploadFields.push({name: field.name, maxCount: field?.max || 10})
+    }
+
+    if(field.type === 'array'){
+      console.log(field.name)
     }
   });
 

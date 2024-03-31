@@ -220,7 +220,7 @@
 </script>
 
 <header
-  class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between dark:border-zinc-700"
+  class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between"
 >
   <div class="flexee-container w-full flex gap-6 justify-between items-center">
     <div class="flex gap-4">
@@ -273,13 +273,12 @@
       <div class="sm:flex flex-auto">
         <div class="items-center hidden mb-3 sm:flex sm:mb-0">
           <form class="lg:pr-3" action="/" method="GET">
-            <label for="users-search" class="sr-only">Search</label>
             <div class="relative lg:w-64 xl:w-96">
               <input
                 type="text"
                 name="email"
                 id="users-search"
-                class="bg-zinc-50 border border-zinc-300 text-zinc-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 px-4 dark:bg-[var(--site-bg)] dark:border-[#1f1f1f] dark:placeholder-[#898989] dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                class="border text-zinc-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 px-4 border-none dark:bg-[#111] dark:placeholder-[#898989] dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder={"Buscar..."}
               />
             </div>
@@ -347,7 +346,15 @@
         </div>
 
         <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-          
+          <div class="flex mr-4">
+                  
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" value="" class="sr-only peer">
+              <a href={collection?.slug + '/api'} class="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-violet-600"><span class="ssr-only"></span></a>
+              <span class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300">Ver API Rest</span>
+            </label>
+
+          </div>
         </div>
       </div>
     </div>
@@ -508,9 +515,9 @@
                           <div
                             class="min-w-[85px] text-base font-normal text-balance text-zinc-500 text-sm"
                           >
-                            {#if key.type === "array"}
+                            {#if key.type === "array" && document}
                               <div class="truncate">
-                                {document[key.name].length} {key.label['es']}
+                                {document[key.name]?.length || 0} {key.label['es']}
                               </div>
                               <!-- {#each document[key.name] as item, index}
                                 <div class="truncate">{item[key.fields[0].name]}</div>
@@ -793,8 +800,9 @@ backdropClass='fixed inset-0 z-40 bg-zinc-900 bg-opacity-50 backdrop-blur-sm dar
   }
 
   .page-header {
-    height: 90px;
+    min-height: 90px;
     background-color: var(--site-bg);
+    border-bottom: 1px solid rgb(255 255 255 / 5%);
   }
 
   .no-content-section {

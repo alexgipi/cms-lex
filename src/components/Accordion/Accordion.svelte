@@ -8,9 +8,11 @@
 	
 	export let collection;
 	export let field;
-	export let stages;
+	export let stages = [];
 	export let itemIndex;
 	export let parentName;
+	export let parentField = undefined;
+	export let name = undefined;
 
 	let foo;
 
@@ -51,6 +53,8 @@
 			formData.append("collection", JSON.stringify(collection));
 			formData.append("field", JSON.stringify(field));
 			formData.append("parentName", parentName);
+			formData.append("name", name);
+			formData.append("parentField", parentField);
 
 			const newStage = {label: "New element " + (stages.length+1)}
 			formData.append("stage", JSON.stringify(newStage))
@@ -78,6 +82,8 @@
 			formData.append("collection", JSON.stringify(collection));
 			formData.append("field", JSON.stringify(field));
 			formData.append("parentName", parentName);
+			formData.append("name", name);
+			formData.append("parentField", parentField);
 
 			const newStage = stage;
 			formData.append("stage", JSON.stringify(newStage))
@@ -179,7 +185,7 @@
   </div>
 
   <div class="flex flex-col gap-4" on:sort={sort} bind:this={foo}>
-	{#each stages as stage, index (stage?.label + index )}
+	{#each stages as stage, index (field.name + stage?.label + index )}
 		<AccordionItem 
 		on:moveUp={handleMoveUp} 
 		on:moveDown={handleMoveDown} 

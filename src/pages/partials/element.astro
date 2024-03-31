@@ -4,12 +4,16 @@ let collection:any = null;
 let field:any = null;
 let length:any = null;
 let parentName:any = null;
+let parentField:any = null;
+let name:any = null;
 let stage:any = null;
 
 if (Astro.request.method === "POST") {
     const formData = await Astro.request.formData();
     length = formData.get("length")
     parentName = formData.get("parentName");
+    name = formData.get("name");
+    parentField = formData.get("parentField");
     collection = formData.get("collection")
     field = formData.get("field")
     stage = formData.get("stage")
@@ -22,6 +26,6 @@ if (Astro.request.method === "POST") {
 
 {
     field?.fields.map((fieldItem:any) => (
-        <FieldFormRowAccordion stage={stage} parentName={parentName} itemIndex={length} parentField={field} collection={collection} field={fieldItem}></FieldFormRowAccordion>
+        <FieldFormRowAccordion stage={stage} parentName={parentName} name={name} itemIndex={length} parentField={field} collection={collection} field={fieldItem}></FieldFormRowAccordion>
     ))
 }

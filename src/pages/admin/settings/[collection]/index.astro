@@ -206,7 +206,7 @@ if (Astro.request.method === "POST") {
       <main class="main padding-0">
         <form method="POST" enctype="multipart/form-data" class="create-document flex-auto flex flex-col">
           <header
-            class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between dark:border-zinc-700"
+            class="page-header sticky top-0 z-30 py-6 block sm:flex items-center justify-between"
           >
             <div class="flexee-container w-full flex justify-between items-center">
               <div class="flex gap-4">
@@ -223,7 +223,7 @@ if (Astro.request.method === "POST") {
                     <label class="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" value="" class="sr-only peer">
                       <div class="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-violet-600"></div>
-                      <span class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300">View API Rest</span>
+                      <span class="ms-3 text-sm font-medium text-zinc-900 dark:text-zinc-300">Ver API Rest</span>
                     </label>
 
                 </div>
@@ -234,7 +234,7 @@ if (Astro.request.method === "POST") {
             </div>
           </header>
 
-          <div class="flexee-container document-form flex-auto">
+          <div class={"flexee-container flex-auto document-form" + (sidebarFields.length > 0 ? ' document-form--with-sidebar' : '')}>
             <div class="document-form__main flex flex-col gap-6">
               {
                 mainFields.map((field) => (
@@ -308,24 +308,32 @@ if (Astro.request.method === "POST") {
 
   .document-form {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .document-form--with-sidebar {
+    display: grid;
     grid-template-columns: 1fr 490px;
+
+    & .document-form__aside {
+      padding-left: 4rem;
+    }
+
+    & .document-form__main {
+      padding-right: 4rem;
+    }
   }
 
   .document-form__aside,
   .document-form__main {
     flex: auto;
-    padding: 3rem 4rem;
-  }
-
-  .document-form__main {
-    padding-left: 0;
+    padding: 3rem 0;
   }
 
   .document-form__aside {
     max-width: 490px;
-    border-left: 1px solid rgb(255 255 255 / 7%);
+    border-left: 1px solid rgb(255 255 255 / 5%);
     width: 100%;
-    padding-right: 0;
   }
 
   .rich-text-editor {
@@ -344,6 +352,8 @@ if (Astro.request.method === "POST") {
   }
   
   .page-header {
+    min-height: 90px;
     background-color: var(--site-bg);
+    border-bottom: 1px solid rgb(255 255 255 / 5%);
   }
 </style>

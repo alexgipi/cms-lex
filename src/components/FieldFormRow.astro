@@ -24,15 +24,17 @@ interface Props {
   fieldCheckedDocsIds?:any;
   itemIndex?:any;
   parentName?:any;
+  name?:any;
   stage?:any
 }
 
-const { field, parentField, document, collection, fieldCheckedDocsIds, itemIndex, parentName, stage }:any = Astro.props;
+const { field, parentField, document, collection, fieldCheckedDocsIds, itemIndex, parentName, name, stage }:any = Astro.props;
 
-let fieldName = parentField ? `${parentField.name}.${itemIndex}.${field.name}` : field.name;
+let fieldName = parentField ? `${parentField.name}[${itemIndex}][${field.name}]` : field.name;
 ---
 <div class="form-row">
   <FormField
+  name={name}
   fieldName={fieldName}
   parentName={parentName}
   itemIndex={itemIndex}
