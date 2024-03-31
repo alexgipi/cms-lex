@@ -10,6 +10,7 @@ import ObjectField from "./ObjectField.svelte";
 import FormFieldChild from "./FormFieldChild.astro";
 import Accordion from "../Accordion/Accordion.svelte";
 import Textarea from "./Textarea.astro";
+import JsonTree from "../JsonTree/JsonTree.astro";
 
 let stages = [
   { id: 1, name: "Antifaces de semillas" },
@@ -246,7 +247,8 @@ if(parentName){
       )}
 
       {field?.type === "object" && (
-        <ObjectField objectValue={document ? document[field.name] : ""} />
+        // <ObjectField objectValue={document ? document[field.name] : ""} />
+        <JsonTree id={'tree-'+field.name} jsonData={document ? document[field.name] : ""}></JsonTre>
       )}
 
       {field?.type === "array" && (
